@@ -1,0 +1,35 @@
+# Ambiente virtual
+.venv/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+
+# PDFs — baixados dinamicamente, não versionados
+fase1-rag/data/pdfs/
+
+# Vector store local — gerado pelo pipeline index
+fase1-rag/chroma_db/
+
+# Variáveis de ambiente
+.env
+.env.*
+
+# Pytest / coverage
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Ruff
+.ruff_cache/
+
+# IDEs
+.vscode/
+.idea/
+*.swp

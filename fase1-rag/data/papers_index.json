@@ -1,0 +1,514 @@
+[
+  {
+    "categoria": "LLM agents",
+    "titulo": "Act Wisely: Cultivating Meta-Cognitive Tool Use in Agentic Multimodal Models",
+    "autores": [
+      "Shilin Yan",
+      "Jintao Tong",
+      "Hongwei Xue",
+      "Xiaojun Tang",
+      "Yangyang Wang",
+      "Kunyu Shi",
+      "Guannan Zhang",
+      "Ruixuan Li",
+      "Yixiong Zou"
+    ],
+    "resumo": "The advent of agentic multimodal models has empowered systems to actively interact with external environments. However, current agents suffer from a profound meta-cognitive deficit: they struggle to arbitrate between leveraging internal knowledge and querying external utilities. Consequently, they frequently fall prey to blind tool invocation, resorting to reflexive tool execution even when queries are resolvable from the raw visual context. This pathological behavior precipitates severe latency bottlenecks and injects extraneous noise that derails sound reasoning. Existing reinforcement learning protocols attempt to mitigate this via a scalarized reward that penalizes tool usage. Yet, this coupled formulation creates an irreconcilable optimization dilemma: an aggressive penalty suppresses essential tool use, whereas a mild penalty is entirely subsumed by the variance of the accuracy reward during advantage normalization, rendering it impotent against tool overuse. To transcend this bottleneck, we propose HDPO, a framework that reframes tool efficiency from a competing scalar objective to a strictly conditional one. By eschewing reward scalarization, HDPO maintains two orthogonal optimization channels: an accuracy channel that maximizes task correctness, and an efficiency channel that enforces execution economy exclusively within accurate trajectories via conditional advantage estimation. This decoupled architecture naturally induces a cognitive curriculum-compelling the agent to first master task resolution before refining its self-reliance. Extensive evaluations demonstrate that our resulting model, Metis, reduces tool invocations by orders of magnitude while simultaneously elevating reasoning accuracy.",
+    "data_publicacao": "2026-04-09T17:59:57+00:00",
+    "arxiv_id": "2604.08545v1",
+    "arquivo_local": "/home/lbr/projetos/ai-engineering-journey/fase1-rag/data/pdfs/Act_Wisely__Cultivating_Meta-Cognitive_Tool_Use_in_Agentic_Multimodal_Models_2604.08545v1.pdf"
+  },
+  {
+    "categoria": "LLM agents",
+    "titulo": "ParseBench: A Document Parsing Benchmark for AI Agents",
+    "autores": [
+      "Boyang Zhang",
+      "Sebastián G. Acosta",
+      "Preston Carlson",
+      "Sacha Bron",
+      "Pierre-Loïc Doulcet",
+      "Simon Suo"
+    ],
+    "resumo": "AI agents are changing the requirements for document parsing. What matters is \\emph{semantic correctness}: parsed output must preserve the structure and meaning needed for autonomous decisions, including correct table structure, precise chart data, semantically meaningful formatting, and visual grounding. Existing benchmarks do not fully capture this setting for enterprise automation, relying on narrow document distributions and text-similarity metrics that miss agent-critical failures. We introduce \\textbf{ParseBench}, a benchmark of ${\\sim}2{,}000$ human-verified pages from enterprise documents spanning insurance, finance, and government, organized around five capability dimensions: tables, charts, content faithfulness, semantic formatting, and visual grounding. Across 14 methods spanning vision-language models, specialized document parsers, and LlamaParse, the benchmark reveals a fragmented capability landscape: no method is consistently strong across all five dimensions. LlamaParse Agentic achieves the highest overall score at \\agenticoverall\\%, and the benchmark highlights the remaining capability gaps across current systems. Dataset and evaluation code are available on \\href{https://huggingface.co/datasets/llamaindex/ParseBench}{HuggingFace} and \\href{https://github.com/run-llama/ParseBench}{GitHub}.",
+    "data_publicacao": "2026-04-09T17:59:36+00:00",
+    "arxiv_id": "2604.08538v1",
+    "arquivo_local": "/home/lbr/projetos/ai-engineering-journey/fase1-rag/data/pdfs/ParseBench__A_Document_Parsing_Benchmark_for_AI_Agents_2604.08538v1.pdf"
+  },
+  {
+    "categoria": "LLM agents",
+    "titulo": "PSI: Shared State as the Missing Layer for Coherent AI-Generated Instruments in Personal AI Agents",
+    "autores": [
+      "Zhiyuan Wang",
+      "Erzhen Hu",
+      "Mark Rucker",
+      "Laura E. Barnes"
+    ],
+    "resumo": "Personal AI tools can now be generated from natural-language requests, but they often remain isolated after creation. We present PSI, a shared-state architecture that turns independently generated modules into coherent instruments: persistent, connected, and chat-complementary artifacts accessible through both GUIs and a generic chat agent. By publishing current state and write-back affordances to a shared personal-context bus, modules enable cross-module reasoning and synchronized actions across interfaces. We study PSI through a three-week autobiographical deployment in a self-developed personal AI environment and show that later-generated instruments can be integrated automatically through the same contract. PSI identifies shared state as the missing systems layer that transforms AI-generated personal software from isolated apps into coherent personal computing environments.",
+    "data_publicacao": "2026-04-09T17:58:36+00:00",
+    "arxiv_id": "2604.08529v1",
+    "arquivo_local": "/home/lbr/projetos/ai-engineering-journey/fase1-rag/data/pdfs/PSI__Shared_State_as_the_Missing_Layer_for_Coherent_AI-Generated_Instruments_in_2604.08529v1.pdf"
+  },
+  {
+    "categoria": "LLM agents",
+    "titulo": "Ads in AI Chatbots? An Analysis of How Large Language Models Navigate Conflicts of Interest",
+    "autores": [
+      "Addison J. Wu",
+      "Ryan Liu",
+      "Shuyue Stella Li",
+      "Yulia Tsvetkov",
+      "Thomas L. Griffiths"
+    ],
+    "resumo": "Today's large language models (LLMs) are trained to align with user preferences through methods such as reinforcement learning. Yet models are beginning to be deployed not merely to satisfy users, but also to generate revenue for the companies that created them through advertisements. This creates the potential for LLMs to face conflicts of interest, where the most beneficial response to a user may not be aligned with the company's incentives. For instance, a sponsored product may be more expensive but otherwise equal to another; in this case, what does (and should) the LLM recommend to the user? In this paper, we provide a framework for categorizing the ways in which conflicting incentives might lead LLMs to change the way they interact with users, inspired by literature from linguistics and advertising regulation. We then present a suite of evaluations to examine how current models handle these tradeoffs. We find that a majority of LLMs forsake user welfare for company incentives in a multitude of conflict of interest situations, including recommending a sponsored product almost twice as expensive (Grok 4.1 Fast, 83%), surfacing sponsored options to disrupt the purchasing process (GPT 5.1, 94%), and concealing prices in unfavorable comparisons (Qwen 3 Next, 24%). Behaviors also vary strongly with levels of reasoning and users' inferred socio-economic status. Our results highlight some of the hidden risks to users that can emerge when companies begin to subtly incentivize advertisements in chatbots.",
+    "data_publicacao": "2026-04-09T17:57:50+00:00",
+    "arxiv_id": "2604.08525v1",
+    "arquivo_local": "/home/lbr/projetos/ai-engineering-journey/fase1-rag/data/pdfs/Ads_in_AI_Chatbots__An_Analysis_of_How_Large_Language_Models_Navigate_Conflicts_2604.08525v1.pdf"
+  },
+  {
+    "categoria": "LLM agents",
+    "titulo": "What Drives Representation Steering? A Mechanistic Case Study on Steering Refusal",
+    "autores": [
+      "Stephen Cheng",
+      "Sarah Wiegreffe",
+      "Dinesh Manocha"
+    ],
+    "resumo": "Applying steering vectors to large language models (LLMs) is an efficient and effective model alignment technique, but we lack an interpretable explanation for how it works-- specifically, what internal mechanisms steering vectors affect and how this results in different model outputs. To investigate the causal mechanisms underlying the effectiveness of steering vectors, we conduct a comprehensive case study on refusal. We propose a multi-token activation patching framework and discover that different steering methodologies leverage functionally interchangeable circuits when applied at the same layer. These circuits reveal that steering vectors primarily interact with the attention mechanism through the OV circuit while largely ignoring the QK circuit-- freezing all attention scores during steering drops performance by only 8.75% across two model families. A mathematical decomposition of the steered OV circuit further reveals semantically interpretable concepts, even in cases where the steering vector itself does not. Leveraging the activation patching results, we show that steering vectors can be sparsified by up to 90-99% while retaining most performance, and that different steering methodologies agree on a subset of important dimensions.",
+    "data_publicacao": "2026-04-09T17:57:14+00:00",
+    "arxiv_id": "2604.08524v1",
+    "arquivo_local": "/home/lbr/projetos/ai-engineering-journey/fase1-rag/data/pdfs/What_Drives_Representation_Steering__A_Mechanistic_Case_Study_on_Steering_Refusa_2604.08524v1.pdf"
+  },
+  {
+    "categoria": "LLM agents",
+    "titulo": "ClawBench: Can AI Agents Complete Everyday Online Tasks?",
+    "autores": [
+      "Yuxuan Zhang",
+      "Yubo Wang",
+      "Yipeng Zhu",
+      "Penghui Du",
+      "Junwen Miao",
+      "Xuan Lu",
+      "Wendong Xu",
+      "Yunzhuo Hao",
+      "Songcheng Cai",
+      "Xiaochen Wang",
+      "Huaisong Zhang",
+      "Xian Wu",
+      "Yi Lu",
+      "Minyi Lei",
+      "Kai Zou",
+      "Huifeng Yin",
+      "Ping Nie",
+      "Liang Chen",
+      "Dongfu Jiang",
+      "Wenhu Chen",
+      "Kelsey R. Allen"
+    ],
+    "resumo": "AI agents may be able to automate your inbox, but can they automate other routine aspects of your life? Everyday online tasks offer a realistic yet unsolved testbed for evaluating the next generation of AI agents. To this end, we introduce ClawBench, an evaluation framework of 153 simple tasks that people need to accomplish regularly in their lives and work, spanning 144 live platforms across 15 categories, from completing purchases and booking appointments to submitting job applications. These tasks require demanding capabilities beyond existing benchmarks, such as obtaining relevant information from user-provided documents, navigating multi-step workflows across diverse platforms, and write-heavy operations like filling in many detailed forms correctly. Unlike existing benchmarks that evaluate agents in offline sandboxes with static pages, ClawBench operates on production websites, preserving the full complexity, dynamic nature, and challenges of real-world web interaction. A lightweight interception layer captures and blocks only the final submission request, ensuring safe evaluation without real-world side effects. Our evaluations of 7 frontier models show that both proprietary and open-source models can complete only a small portion of these tasks. For example, Claude Sonnet 4.6 achieves only 33.3%. Progress on ClawBench brings us closer to AI agents that can function as reliable general-purpose assistants.",
+    "data_publicacao": "2026-04-09T17:57:13+00:00",
+    "arxiv_id": "2604.08523v1",
+    "arquivo_local": "/home/lbr/projetos/ai-engineering-journey/fase1-rag/data/pdfs/ClawBench__Can_AI_Agents_Complete_Everyday_Online_Tasks__2604.08523v1.pdf"
+  },
+  {
+    "categoria": "LLM agents",
+    "titulo": "Cram Less to Fit More: Training Data Pruning Improves Memorization of Facts",
+    "autores": [
+      "Jiayuan Ye",
+      "Vitaly Feldman",
+      "Kunal Talwar"
+    ],
+    "resumo": "Large language models (LLMs) can struggle to memorize factual knowledge in their parameters, often leading to hallucinations and poor performance on knowledge-intensive tasks. In this paper, we formalize fact memorization from an information-theoretic perspective and study how training data distributions affect fact accuracy. We show that fact accuracy is suboptimal (below the capacity limit) whenever the amount of information contained in the training data facts exceeds model capacity. This is further exacerbated when the fact frequency distribution is skewed (e.g. a power law).   We propose data selection schemes based on the training loss alone that aim to limit the number of facts in the training data and flatten their frequency distribution. On semi-synthetic datasets containing high-entropy facts, our selection method effectively boosts fact accuracy to the capacity limit. When pretraining language models from scratch on an annotated Wikipedia corpus, our selection method enables a GPT2-Small model (110m parameters) to memorize 1.3X more entity facts compared to standard training, matching the performance of a 10X larger model (1.3B parameters) pretrained on the full dataset.",
+    "data_publicacao": "2026-04-09T17:55:50+00:00",
+    "arxiv_id": "2604.08519v1",
+    "arquivo_local": "/home/lbr/projetos/ai-engineering-journey/fase1-rag/data/pdfs/Cram_Less_to_Fit_More__Training_Data_Pruning_Improves_Memorization_of_Facts_2604.08519v1.pdf"
+  },
+  {
+    "categoria": "LLM agents",
+    "titulo": "Learning vs. Optimizing Bidders in Budgeted Auctions",
+    "autores": [
+      "Giannis Fikioris",
+      "Balasubramanian Sivan",
+      "Éva Tardos"
+    ],
+    "resumo": "The study of repeated interactions between a learner and a utility-maximizing optimizer has yielded deep insights into the manipulability of learning algorithms. However, existing literature primarily focuses on independent, unlinked rounds, largely ignoring the ubiquitous practical reality of budget constraints. In this paper, we study this interaction in repeated second-price auctions in a Bayesian setting between a learning agent and a strategic agent, both subject to strict budget constraints, showing that such cross-round constraints fundamentally alter the strategic landscape.   First, we generalize the classic Stackelberg equilibrium to the Budgeted Stackelberg Equilibrium. We prove that an optimizer's optimal strategy in a budgeted setting requires time-multiplexing; for a $k$-dimensional budget constraint, the optimal strategy strictly decomposes into up to $k+1$ distinct phases, with each phase employing a possibly unique mixed strategy (the case of $k=0$ recovers the classic Stackelberg equilibrium where the optimizer repeatedly uses a single mixed strategy). Second, we address the intriguing question of non-manipulability. We prove that when the learner employs a standard Proportional controller (the \"P\" of the PID-controller) to pace their bids, the optimizer's utility is upper bounded by their objective value in the Budgeted Stackelberg Equilibrium baseline. By bounding the dynamics of the PID controller via a novel analysis, our results establish that this widely used control-theoretic heuristic is actually strategically robust.",
+    "data_publicacao": "2026-04-09T17:54:27+00:00",
+    "arxiv_id": "2604.08517v1",
+    "arquivo_local": "/home/lbr/projetos/ai-engineering-journey/fase1-rag/data/pdfs/Learning_vs__Optimizing_Bidders_in_Budgeted_Auctions_2604.08517v1.pdf"
+  },
+  {
+    "categoria": "LLM agents",
+    "titulo": "MolmoWeb: Open Visual Web Agent and Open Data for the Open Web",
+    "autores": [
+      "Tanmay Gupta",
+      "Piper Wolters",
+      "Zixian Ma",
+      "Peter Sushko",
+      "Rock Yuren Pang",
+      "Diego Llanes",
+      "Yue Yang",
+      "Taira Anderson",
+      "Boyuan Zheng",
+      "Zhongzheng Ren",
+      "Harsh Trivedi",
+      "Taylor Blanton",
+      "Caleb Ouellette",
+      "Winson Han",
+      "Ali Farhadi",
+      "Ranjay Krishna"
+    ],
+    "resumo": "Web agents--autonomous systems that navigate and execute tasks on the web on behalf of users--have the potential to transform how people interact with the digital world. However, the most capable web agents today rely on proprietary models with undisclosed training data and recipes, limiting scientific understanding, reproducibility, and community-driven progress.   We believe agents for the open web should be built in the open. To this end, we introduce (1) MolmoWebMix, a large and diverse mixture of browser task demonstrations and web-GUI perception data and (2) MolmoWeb, a family of fully open multimodal web agents. Specifically, MolmoWebMix combines over 100K synthetic task trajectories from multiple complementary generation pipelines with 30K+ human demonstrations, atomic web-skill trajectories, and GUI perception data, including referring expression grounding and screenshot question answering. MolmoWeb agents operate as instruction-conditioned visual-language action policies: given a task instruction and a webpage screenshot, they predict the next browser action, requiring no access to HTML, accessibility trees, or specialized APIs.   Available in 4B and 8B size, on browser-use benchmarks like WebVoyager, Online-Mind2Web, and DeepShop, MolmoWeb agents achieve state-of-the-art results outperforming similar scale open-weight-only models such as Fara-7B, UI-Tars-1.5-7B, and Holo1-7B. MolmoWeb-8B also surpasses set-of-marks (SoM) agents built on much larger closed frontier models like GPT-4o. We further demonstrate consistent gains through test-time scaling via parallel rollouts with best-of-N selection, achieving 94.7% and 60.5% pass@4 (compared to 78.2% and 35.3% pass@1) on WebVoyager and Online-Mind2Web respectively. We will release model checkpoints, training data, code, and a unified evaluation harness to enable reproducibility and accelerate open research on web agents.",
+    "data_publicacao": "2026-04-09T17:54:02+00:00",
+    "arxiv_id": "2604.08516v1",
+    "arquivo_local": "/home/lbr/projetos/ai-engineering-journey/fase1-rag/data/pdfs/MolmoWeb__Open_Visual_Web_Agent_and_Open_Data_for_the_Open_Web_2604.08516v1.pdf"
+  },
+  {
+    "categoria": "LLM agents",
+    "titulo": "What do Language Models Learn and When? The Implicit Curriculum Hypothesis",
+    "autores": [
+      "Emmy Liu",
+      "Kaiser Sun",
+      "Millicent Li",
+      "Isabelle Lee",
+      "Lindia Tjuatja",
+      "Jen-tse Huang",
+      "Graham Neubig"
+    ],
+    "resumo": "Large language models (LLMs) can perform remarkably complex tasks, yet the fine-grained details of how these capabilities emerge during pretraining remain poorly understood. Scaling laws on validation loss tell us how much a model improves with additional compute, but not what skills it acquires in which order. To remedy this, we propose the Implicit Curriculum Hypothesis: pretraining follows a compositional and predictable curriculum across models and data mixtures. We test this by designing a suite of simple, composable tasks spanning retrieval, morphological transformations, coreference, logical reasoning, and mathematics. Using these tasks, we track emergence points across four model families spanning sizes from 410M-13B parameters. We find that emergence orderings of when models reach fixed accuracy thresholds are strikingly consistent ($ρ= .81$ across 45 model pairs), and that composite tasks most often emerge after their component tasks. Furthermore, we find that this structure is encoded in model representations: tasks with similar function vector representations also tend to follow similar trajectories in training. By using the space of representations derived from our task set, we can effectively predict the training trajectories of simple held-out compositional tasks throughout the course of pretraining ($R^2 = .68$-$.84$ across models) without previously evaluating them. Together, these results suggest that pretraining is more structured than loss curves reveal: skills emerge in a compositional order that is consistent across models and readable from their internals.",
+    "data_publicacao": "2026-04-09T17:50:12+00:00",
+    "arxiv_id": "2604.08510v1",
+    "arquivo_local": "/home/lbr/projetos/ai-engineering-journey/fase1-rag/data/pdfs/What_do_Language_Models_Learn_and_When__The_Implicit_Curriculum_Hypothesis_2604.08510v1.pdf"
+  },
+  {
+    "categoria": "RAG retrieval augmented generation",
+    "titulo": "GaussiAnimate: Reconstruct and Rig Animatable Categories with Level of Dynamics",
+    "autores": [
+      "Jiaxin Wang",
+      "Dongxin Lyu",
+      "Zeyu Cai",
+      "Zhiyang Dou",
+      "Cheng Lin",
+      "Anpei Chen",
+      "Yuliang Xiu"
+    ],
+    "resumo": "Free-form bones, that conform closely to the surface, can effectively capture non-rigid deformations, but lack a kinematic structure necessary for intuitive control. Thus, we propose a Scaffold-Skin Rigging System, termed \"Skelebones\", with three key steps: (1) Bones: compress temporally-consistent deformable Gaussians into free-form bones, approximating non-rigid surface deformations; (2) Skeleton: extract a Mean Curvature Skeleton from canonical Gaussians and refine it temporally, ensuring a category-agnostic, motion-adaptive, and topology-correct kinematic structure; (3) Binding: bind the skeleton and bones via non-parametric partwise motion matching (PartMM), synthesizing novel bone motions by matching, retrieving, and blending existing ones. Collectively, these three steps enable us to compress the Level of Dynamics of 4D shapes into compact skelebones that are both controllable and expressive. We validate our approach on both synthetic and real-world datasets, achieving significant improvements in reanimation performance across unseen poses-with 17.3% PSNR gains over Linear Blend Skinning (LBS) and 21.7% over Bag-of-Bones (BoB)-while maintaining excellent reconstruction fidelity, particularly for characters exhibiting complex non-rigid surface dynamics. Our Partwise Motion Matching algorithm demonstrates strong generalization to both Gaussian and mesh representations, especially under low-data regime (~1000 frames), achieving 48.4% RMSE improvement over robust LBS and outperforming GRU- and MLP-based learning methods by >20%. Code will be made publicly available for research purposes at cookmaker.cn/gaussianimate.",
+    "data_publicacao": "2026-04-09T17:59:59+00:00",
+    "arxiv_id": "2604.08547v1",
+    "arquivo_local": "/home/lbr/projetos/ai-engineering-journey/fase1-rag/data/pdfs/GaussiAnimate__Reconstruct_and_Rig_Animatable_Categories_with_Level_of_Dynamics_2604.08547v1.pdf"
+  },
+  {
+    "categoria": "RAG retrieval augmented generation",
+    "titulo": "ETCH-X: Robustify Expressive Body Fitting to Clothed Humans with Composable Datasets",
+    "autores": [
+      "Xiaoben Li",
+      "Jingyi Wu",
+      "Zeyu Cai",
+      "Yu Siyuan",
+      "Boqian Li",
+      "Yuliang Xiu"
+    ],
+    "resumo": "Human body fitting, which aligns parametric body models such as SMPL to raw 3D point clouds of clothed humans, serves as a crucial first step for downstream tasks like animation and texturing. An effective fitting method should be both locally expressive-capturing fine details such as hands and facial features-and globally robust to handle real-world challenges, including clothing dynamics, pose variations, and noisy or partial inputs. Existing approaches typically excel in only one aspect, lacking an all-in-one solution.We upgrade ETCH to ETCH-X, which leverages a tightness-aware fitting paradigm to filter out clothing dynamics (\"undress\"), extends expressiveness with SMPL-X, and replaces explicit sparse markers (which are highly sensitive to partial data) with implicit dense correspondences (\"dense fit\") for more robust and fine-grained body fitting. Our disentangled \"undress\" and \"dense fit\" modular stages enable separate and scalable training on composable data sources, including diverse simulated garments (CLOTH3D), large-scale full-body motions (AMASS), and fine-grained hand gestures (InterHand2.6M), improving outfit generalization and pose robustness of both bodies and hands. Our approach achieves robust and expressive fitting across diverse clothing, poses, and levels of input completeness, delivering a substantial performance improvement over ETCH on both: 1) seen data, such as 4D-Dress (MPJPE-All, 33.0% ) and CAPE (V2V-Hands, 35.8% ), and 2) unseen data, such as BEDLAM2.0 (MPJPE-All, 80.8% ; V2V-All, 80.5% ). Code and models will be released at https://xiaobenli00.github.io/ETCH-X/.",
+    "data_publicacao": "2026-04-09T17:59:59+00:00",
+    "arxiv_id": "2604.08548v1",
+    "arquivo_local": "/home/lbr/projetos/ai-engineering-journey/fase1-rag/data/pdfs/ETCH-X__Robustify_Expressive_Body_Fitting_to_Clothed_Humans_with_Composable_Data_2604.08548v1.pdf"
+  },
+  {
+    "categoria": "RAG retrieval augmented generation",
+    "titulo": "When Numbers Speak: Aligning Textual Numerals and Visual Instances in Text-to-Video Diffusion Models",
+    "autores": [
+      "Zhengyang Sun",
+      "Yu Chen",
+      "Xin Zhou",
+      "Xiaofan Li",
+      "Xiwu Chen",
+      "Dingkang Liang",
+      "Xiang Bai"
+    ],
+    "resumo": "Text-to-video diffusion models have enabled open-ended video synthesis, but often struggle with generating the correct number of objects specified in a prompt. We introduce NUMINA , a training-free identify-then-guide framework for improved numerical alignment. NUMINA identifies prompt-layout inconsistencies by selecting discriminative self- and cross-attention heads to derive a countable latent layout. It then refines this layout conservatively and modulates cross-attention to guide regeneration. On the introduced CountBench, NUMINA improves counting accuracy by up to 7.4% on Wan2.1-1.3B, and by 4.9% and 5.5% on 5B and 14B models, respectively. Furthermore, CLIP alignment is improved while maintaining temporal consistency. These results demonstrate that structural guidance complements seed search and prompt enhancement, offering a practical path toward count-accurate text-to-video diffusion. The code is available at https://github.com/H-EmbodVis/NUMINA.",
+    "data_publicacao": "2026-04-09T17:59:57+00:00",
+    "arxiv_id": "2604.08546v1",
+    "arquivo_local": "/home/lbr/projetos/ai-engineering-journey/fase1-rag/data/pdfs/When_Numbers_Speak__Aligning_Textual_Numerals_and_Visual_Instances_in_Text-to-Vi_2604.08546v1.pdf"
+  },
+  {
+    "categoria": "RAG retrieval augmented generation",
+    "titulo": "SIM1: Physics-Aligned Simulator as Zero-Shot Data Scaler in Deformable Worlds",
+    "autores": [
+      "Yunsong Zhou",
+      "Hangxu Liu",
+      "Xuekun Jiang",
+      "Xing Shen",
+      "Yuanzhen Zhou",
+      "Hui Wang",
+      "Baole Fang",
+      "Yang Tian",
+      "Mulin Yu",
+      "Qiaojun Yu",
+      "Li Ma",
+      "Hengjie Li",
+      "Hanqing Wang",
+      "Jia Zeng",
+      "Jiangmiao Pang"
+    ],
+    "resumo": "Robotic manipulation with deformable objects represents a data-intensive regime in embodied learning, where shape, contact, and topology co-evolve in ways that far exceed the variability of rigids. Although simulation promises relief from the cost of real-world data acquisition, prevailing sim-to-real pipelines remain rooted in rigid-body abstractions, producing mismatched geometry, fragile soft dynamics, and motion primitives poorly suited for cloth interaction. We posit that simulation fails not for being synthetic, but for being ungrounded. To address this, we introduce SIM1, a physics-aligned real-to-sim-to-real data engine that grounds simulation in the physical world. Given limited demonstrations, the system digitizes scenes into metric-consistent twins, calibrates deformable dynamics through elastic modeling, and expands behaviors via diffusion-based trajectory generation with quality filtering. This pipeline transforms sparse observations into scaled synthetic supervision with near-demonstration fidelity. Experiments show that policies trained on purely synthetic data achieve parity with real-data baselines at a 1:15 equivalence ratio, while delivering 90% zero-shot success and 50% generalization gains in real-world deployment. These results validate physics-aligned simulation as scalable supervision for deformable manipulation and a practical pathway for data-efficient policy learning.",
+    "data_publicacao": "2026-04-09T17:59:52+00:00",
+    "arxiv_id": "2604.08544v1",
+    "arquivo_local": "/home/lbr/projetos/ai-engineering-journey/fase1-rag/data/pdfs/SIM1__Physics-Aligned_Simulator_as_Zero-Shot_Data_Scaler_in_Deformable_Worlds_2604.08544v1.pdf"
+  },
+  {
+    "categoria": "RAG retrieval augmented generation",
+    "titulo": "AVGen-Bench: A Task-Driven Benchmark for Multi-Granular Evaluation of Text-to-Audio-Video Generation",
+    "autores": [
+      "Ziwei Zhou",
+      "Zeyuan Lai",
+      "Rui Wang",
+      "Yifan Yang",
+      "Zhen Xing",
+      "Yuqing Yang",
+      "Qi Dai",
+      "Lili Qiu",
+      "Chong Luo"
+    ],
+    "resumo": "Text-to-Audio-Video (T2AV) generation is rapidly becoming a core interface for media creation, yet its evaluation remains fragmented. Existing benchmarks largely assess audio and video in isolation or rely on coarse embedding similarity, failing to capture the fine-grained joint correctness required by realistic prompts. We introduce AVGen-Bench, a task-driven benchmark for T2AV generation featuring high-quality prompts across 11 real-world categories. To support comprehensive assessment, we propose a multi-granular evaluation framework that combines lightweight specialist models with Multimodal Large Language Models (MLLMs), enabling evaluation from perceptual quality to fine-grained semantic controllability. Our evaluation reveals a pronounced gap between strong audio-visual aesthetics and weak semantic reliability, including persistent failures in text rendering, speech coherence, physical reasoning, and a universal breakdown in musical pitch control. Code and benchmark resources are available at http://aka.ms/avgenbench.",
+    "data_publicacao": "2026-04-09T17:59:39+00:00",
+    "arxiv_id": "2604.08540v1",
+    "arquivo_local": "/home/lbr/projetos/ai-engineering-journey/fase1-rag/data/pdfs/AVGen-Bench__A_Task-Driven_Benchmark_for_Multi-Granular_Evaluation_of_Text-to-Au_2604.08540v1.pdf"
+  },
+  {
+    "categoria": "RAG retrieval augmented generation",
+    "titulo": "OpenVLThinkerV2: A Generalist Multimodal Reasoning Model for Multi-domain Visual Tasks",
+    "autores": [
+      "Wenbo Hu",
+      "Xin Chen",
+      "Yan Gao-Tian",
+      "Yihe Deng",
+      "Nanyun Peng",
+      "Kai-Wei Chang"
+    ],
+    "resumo": "Group Relative Policy Optimization (GRPO) has emerged as the de facto Reinforcement Learning (RL) objective driving recent advancements in Multimodal Large Language Models. However, extending this success to open-source multimodal generalist models remains heavily constrained by two primary challenges: the extreme variance in reward topologies across diverse visual tasks, and the inherent difficulty of balancing fine-grained perception with multi-step reasoning capabilities. To address these issues, we introduce Gaussian GRPO (G$^2$RPO), a novel RL training objective that replaces standard linear scaling with non-linear distributional matching. By mathematically forcing the advantage distribution of any given task to strictly converge to a standard normal distribution, $\\mathcal{N}(0,1)$, G$^2$RPO theoretically ensures inter-task gradient equity, mitigates vulnerabilities to heavy-tail outliers, and offers symmetric update for positive and negative rewards. Leveraging the enhanced training stability provided by G$^2$RPO, we introduce two task-level shaping mechanisms to seamlessly balance perception and reasoning. First, response length shaping dynamically elicits extended reasoning chains for complex queries while enforce direct outputs to bolster visual grounding. Second, entropy shaping tightly bounds the model's exploration zone, effectively preventing both entropy collapse and entropy explosion. Integrating these methodologies, we present OpenVLThinkerV2, a highly robust, general-purpose multimodal model. Extensive evaluations across 18 diverse benchmarks demonstrate its superior performance over strong open-source and leading proprietary frontier models.",
+    "data_publicacao": "2026-04-09T17:59:39+00:00",
+    "arxiv_id": "2604.08539v1",
+    "arquivo_local": "/home/lbr/projetos/ai-engineering-journey/fase1-rag/data/pdfs/OpenVLThinkerV2__A_Generalist_Multimodal_Reasoning_Model_for_Multi-domain_Visual_2604.08539v1.pdf"
+  },
+  {
+    "categoria": "RAG retrieval augmented generation",
+    "titulo": "Meta-learning In-Context Enables Training-Free Cross Subject Brain Decoding",
+    "autores": [
+      "Mu Nan",
+      "Muquan Yu",
+      "Weijian Mai",
+      "Jacob S. Prince",
+      "Hossein Adeli",
+      "Rui Zhang",
+      "Jiahang Cao",
+      "Benjamin Becker",
+      "John A. Pyles",
+      "Margaret M. Henderson",
+      "Chunfeng Song",
+      "Nikolaus Kriegeskorte",
+      "Michael J. Tarr",
+      "Xiaoqing Hu",
+      "Andrew F. Luo"
+    ],
+    "resumo": "Visual decoding from brain signals is a key challenge at the intersection of computer vision and neuroscience, requiring methods that bridge neural representations and computational models of vision. A field-wide goal is to achieve generalizable, cross-subject models. A major obstacle towards this goal is the substantial variability in neural representations across individuals, which has so far required training bespoke models or fine-tuning separately for each subject. To address this challenge, we introduce a meta-optimized approach for semantic visual decoding from fMRI that generalizes to novel subjects without any fine-tuning. By simply conditioning on a small set of image-brain activation examples from the new individual, our model rapidly infers their unique neural encoding patterns to facilitate robust and efficient visual decoding. Our approach is explicitly optimized for in-context learning of the new subject's encoding model and performs decoding by hierarchical inference, inverting the encoder. First, for multiple brain regions, we estimate the per-voxel visual response encoder parameters by constructing a context over multiple stimuli and responses. Second, we construct a context consisting of encoder parameters and response values over multiple voxels to perform aggregated functional inversion. We demonstrate strong cross-subject and cross-scanner generalization across diverse visual backbones without retraining or fine-tuning. Moreover, our approach requires neither anatomical alignment nor stimulus overlap. This work is a critical step towards a generalizable foundation model for non-invasive brain decoding.",
+    "data_publicacao": "2026-04-09T17:59:32+00:00",
+    "arxiv_id": "2604.08537v1",
+    "arquivo_local": "/home/lbr/projetos/ai-engineering-journey/fase1-rag/data/pdfs/Meta-learning_In-Context_Enables_Training-Free_Cross_Subject_Brain_Decoding_2604.08537v1.pdf"
+  },
+  {
+    "categoria": "RAG retrieval augmented generation",
+    "titulo": "RewardFlow: Generate Images by Optimizing What You Reward",
+    "autores": [
+      "Onkar Susladkar",
+      "Dong-Hwan Jang",
+      "Tushar Prakash",
+      "Adheesh Juvekar",
+      "Vedant Shah",
+      "Ayush Barik",
+      "Nabeel Bashir",
+      "Muntasir Wahed",
+      "Ritish Shrirao",
+      "Ismini Lourentzou"
+    ],
+    "resumo": "We introduce RewardFlow, an inversion-free framework that steers pretrained diffusion and flow-matching models at inference time through multi-reward Langevin dynamics. RewardFlow unifies complementary differentiable rewards for semantic alignment, perceptual fidelity, localized grounding, object consistency, and human preference, and further introduces a differentiable VQA-based reward that provides fine-grained semantic supervision through language-vision reasoning. To coordinate these heterogeneous objectives, we design a prompt-aware adaptive policy that extracts semantic primitives from the instruction, infers edit intent, and dynamically modulates reward weights and step sizes throughout sampling. Across several image editing and compositional generation benchmarks, RewardFlow delivers state-of-the-art edit fidelity and compositional alignment.",
+    "data_publicacao": "2026-04-09T17:59:19+00:00",
+    "arxiv_id": "2604.08536v1",
+    "arquivo_local": "/home/lbr/projetos/ai-engineering-journey/fase1-rag/data/pdfs/RewardFlow__Generate_Images_by_Optimizing_What_You_Reward_2604.08536v1.pdf"
+  },
+  {
+    "categoria": "RAG retrieval augmented generation",
+    "titulo": "Fail2Drive: Benchmarking Closed-Loop Driving Generalization",
+    "autores": [
+      "Simon Gerstenecker",
+      "Andreas Geiger",
+      "Katrin Renz"
+    ],
+    "resumo": "Generalization under distribution shift remains a central bottleneck for closed-loop autonomous driving. Although simulators like CARLA enable safe and scalable testing, existing benchmarks rarely measure true generalization: they typically reuse training scenarios at test time. Success can therefore reflect memorization rather than robust driving behavior. We introduce Fail2Drive, the first paired-route benchmark for closed-loop generalization in CARLA, with 200 routes and 17 new scenario classes spanning appearance, layout, behavioral, and robustness shifts. Each shifted route is matched with an in-distribution counterpart, isolating the effect of the shift and turning qualitative failures into quantitative diagnostics. Evaluating multiple state-of-the-art models reveals consistent degradation, with an average success-rate drop of 22.8\\%. Our analysis uncovers unexpected failure modes, such as ignoring objects clearly visible in the LiDAR and failing to learn the fundamental concepts of free and occupied space. To accelerate follow-up work, Fail2Drive includes an open-source toolbox for creating new scenarios and validating solvability via a privileged expert policy. Together, these components establish a reproducible foundation for benchmarking and improving closed-loop driving generalization. We open-source all code, data, and tools at https://github.com/autonomousvision/fail2drive .",
+    "data_publicacao": "2026-04-09T17:59:18+00:00",
+    "arxiv_id": "2604.08535v1",
+    "arquivo_local": "/home/lbr/projetos/ai-engineering-journey/fase1-rag/data/pdfs/Fail2Drive__Benchmarking_Closed-Loop_Driving_Generalization_2604.08535v1.pdf"
+  },
+  {
+    "categoria": "RAG retrieval augmented generation",
+    "titulo": "ActiveGlasses: Learning Manipulation with Active Vision from Ego-centric Human Demonstration",
+    "autores": [
+      "Yanwen Zou",
+      "Chenyang Shi",
+      "Wenye Yu",
+      "Han Xue",
+      "Jun Lv",
+      "Ye Pan",
+      "Chuan Wen",
+      "Cewu Lu"
+    ],
+    "resumo": "Large-scale real-world robot data collection is a prerequisite for bringing robots into everyday deployment. However, existing pipelines often rely on specialized handheld devices to bridge the embodiment gap, which not only increases operator burden and limits scalability, but also makes it difficult to capture the naturally coordinated perception-manipulation behaviors of human daily interaction. This challenge calls for a more natural system that can faithfully capture human manipulation and perception behaviors while enabling zero-shot transfer to robotic platforms. We introduce ActiveGlasses, a system for learning robot manipulation from ego-centric human demonstrations with active vision. A stereo camera mounted on smart glasses serves as the sole perception device for both data collection and policy inference: the operator wears it during bare-hand demonstrations, and the same camera is mounted on a 6-DoF perception arm during deployment to reproduce human active vision. To enable zero-transfer, we extract object trajectories from demonstrations and use an object-centric point-cloud policy to jointly predict manipulation and head movement. Across several challenging tasks involving occlusion and precise interaction, ActiveGlasses achieves zero-shot transfer with active vision, consistently outperforms strong baselines under the same hardware setup, and generalizes across two robot platforms.",
+    "data_publicacao": "2026-04-09T17:59:08+00:00",
+    "arxiv_id": "2604.08534v1",
+    "arquivo_local": "/home/lbr/projetos/ai-engineering-journey/fase1-rag/data/pdfs/ActiveGlasses__Learning_Manipulation_with_Active_Vision_from_Ego-centric_Human_D_2604.08534v1.pdf"
+  },
+  {
+    "categoria": "LLM fine-tuning",
+    "titulo": "Meta-learning In-Context Enables Training-Free Cross Subject Brain Decoding",
+    "autores": [
+      "Mu Nan",
+      "Muquan Yu",
+      "Weijian Mai",
+      "Jacob S. Prince",
+      "Hossein Adeli",
+      "Rui Zhang",
+      "Jiahang Cao",
+      "Benjamin Becker",
+      "John A. Pyles",
+      "Margaret M. Henderson",
+      "Chunfeng Song",
+      "Nikolaus Kriegeskorte",
+      "Michael J. Tarr",
+      "Xiaoqing Hu",
+      "Andrew F. Luo"
+    ],
+    "resumo": "Visual decoding from brain signals is a key challenge at the intersection of computer vision and neuroscience, requiring methods that bridge neural representations and computational models of vision. A field-wide goal is to achieve generalizable, cross-subject models. A major obstacle towards this goal is the substantial variability in neural representations across individuals, which has so far required training bespoke models or fine-tuning separately for each subject. To address this challenge, we introduce a meta-optimized approach for semantic visual decoding from fMRI that generalizes to novel subjects without any fine-tuning. By simply conditioning on a small set of image-brain activation examples from the new individual, our model rapidly infers their unique neural encoding patterns to facilitate robust and efficient visual decoding. Our approach is explicitly optimized for in-context learning of the new subject's encoding model and performs decoding by hierarchical inference, inverting the encoder. First, for multiple brain regions, we estimate the per-voxel visual response encoder parameters by constructing a context over multiple stimuli and responses. Second, we construct a context consisting of encoder parameters and response values over multiple voxels to perform aggregated functional inversion. We demonstrate strong cross-subject and cross-scanner generalization across diverse visual backbones without retraining or fine-tuning. Moreover, our approach requires neither anatomical alignment nor stimulus overlap. This work is a critical step towards a generalizable foundation model for non-invasive brain decoding.",
+    "data_publicacao": "2026-04-09T17:59:32+00:00",
+    "arxiv_id": "2604.08537v1",
+    "arquivo_local": "/home/lbr/projetos/ai-engineering-journey/fase1-rag/data/pdfs/Meta-learning_In-Context_Enables_Training-Free_Cross_Subject_Brain_Decoding_2604.08537v1.pdf"
+  },
+  {
+    "categoria": "LLM fine-tuning",
+    "titulo": "A-SLIP: Acoustic Sensing for Continuous In-hand Slip Estimation",
+    "autores": [
+      "Uksang Yoo",
+      "Yuemin Mao",
+      "Jean Oh",
+      "Jeffrey Ichnowski"
+    ],
+    "resumo": "Reliable in-hand manipulation requires accurate real-time estimation of slip between a gripper and a grasped object. Existing tactile sensing approaches based on vision, capacitance, or force-torque measurements face fundamental trade-offs in form factor, durability, and their ability to jointly estimate slip direction and magnitude. We present A-SLIP, a multi-channel acoustic sensing system integrated into a parallel-jaw gripper for estimating continuous slip in the grasp plane. The A-SLIP sensor consists of piezoelectric microphones positioned behind a textured silicone contact pad to capture structured contact-induced vibrations. The A-SLIP model processes synchronized multi-channel audio as log-mel spectrograms using a lightweight convolutional network, jointly predicting the presence, direction, and magnitude of slip. Across experiments with robot- and externally induced slip conditions, the fine-tuned four-microphone configuration achieves a mean absolute directional error of 14.1 degrees, outperforms baselines by up to 12 percent in detection accuracy, and reduces directional error by 32 percent. Compared with single-microphone configurations, the multi-channel design reduces directional error by 64 percent and magnitude error by 68 percent, underscoring the importance of spatial acoustic sensing in resolving slip direction ambiguity. We further evaluate A-SLIP in closed-loop reactive control and find that it enables reliable, low-cost, real-time estimation of in-hand slip. Project videos and additional details are available at https://a-slip.github.io.",
+    "data_publicacao": "2026-04-09T17:58:27+00:00",
+    "arxiv_id": "2604.08528v1",
+    "arquivo_local": "/home/lbr/projetos/ai-engineering-journey/fase1-rag/data/pdfs/A-SLIP__Acoustic_Sensing_for_Continuous_In-hand_Slip_Estimation_2604.08528v1.pdf"
+  },
+  {
+    "categoria": "LLM fine-tuning",
+    "titulo": "Ads in AI Chatbots? An Analysis of How Large Language Models Navigate Conflicts of Interest",
+    "autores": [
+      "Addison J. Wu",
+      "Ryan Liu",
+      "Shuyue Stella Li",
+      "Yulia Tsvetkov",
+      "Thomas L. Griffiths"
+    ],
+    "resumo": "Today's large language models (LLMs) are trained to align with user preferences through methods such as reinforcement learning. Yet models are beginning to be deployed not merely to satisfy users, but also to generate revenue for the companies that created them through advertisements. This creates the potential for LLMs to face conflicts of interest, where the most beneficial response to a user may not be aligned with the company's incentives. For instance, a sponsored product may be more expensive but otherwise equal to another; in this case, what does (and should) the LLM recommend to the user? In this paper, we provide a framework for categorizing the ways in which conflicting incentives might lead LLMs to change the way they interact with users, inspired by literature from linguistics and advertising regulation. We then present a suite of evaluations to examine how current models handle these tradeoffs. We find that a majority of LLMs forsake user welfare for company incentives in a multitude of conflict of interest situations, including recommending a sponsored product almost twice as expensive (Grok 4.1 Fast, 83%), surfacing sponsored options to disrupt the purchasing process (GPT 5.1, 94%), and concealing prices in unfavorable comparisons (Qwen 3 Next, 24%). Behaviors also vary strongly with levels of reasoning and users' inferred socio-economic status. Our results highlight some of the hidden risks to users that can emerge when companies begin to subtly incentivize advertisements in chatbots.",
+    "data_publicacao": "2026-04-09T17:57:50+00:00",
+    "arxiv_id": "2604.08525v1",
+    "arquivo_local": "/home/lbr/projetos/ai-engineering-journey/fase1-rag/data/pdfs/Ads_in_AI_Chatbots__An_Analysis_of_How_Large_Language_Models_Navigate_Conflicts_2604.08525v1.pdf"
+  },
+  {
+    "categoria": "LLM fine-tuning",
+    "titulo": "What Drives Representation Steering? A Mechanistic Case Study on Steering Refusal",
+    "autores": [
+      "Stephen Cheng",
+      "Sarah Wiegreffe",
+      "Dinesh Manocha"
+    ],
+    "resumo": "Applying steering vectors to large language models (LLMs) is an efficient and effective model alignment technique, but we lack an interpretable explanation for how it works-- specifically, what internal mechanisms steering vectors affect and how this results in different model outputs. To investigate the causal mechanisms underlying the effectiveness of steering vectors, we conduct a comprehensive case study on refusal. We propose a multi-token activation patching framework and discover that different steering methodologies leverage functionally interchangeable circuits when applied at the same layer. These circuits reveal that steering vectors primarily interact with the attention mechanism through the OV circuit while largely ignoring the QK circuit-- freezing all attention scores during steering drops performance by only 8.75% across two model families. A mathematical decomposition of the steered OV circuit further reveals semantically interpretable concepts, even in cases where the steering vector itself does not. Leveraging the activation patching results, we show that steering vectors can be sparsified by up to 90-99% while retaining most performance, and that different steering methodologies agree on a subset of important dimensions.",
+    "data_publicacao": "2026-04-09T17:57:14+00:00",
+    "arxiv_id": "2604.08524v1",
+    "arquivo_local": "/home/lbr/projetos/ai-engineering-journey/fase1-rag/data/pdfs/What_Drives_Representation_Steering__A_Mechanistic_Case_Study_on_Steering_Refusa_2604.08524v1.pdf"
+  },
+  {
+    "categoria": "LLM fine-tuning",
+    "titulo": "Cram Less to Fit More: Training Data Pruning Improves Memorization of Facts",
+    "autores": [
+      "Jiayuan Ye",
+      "Vitaly Feldman",
+      "Kunal Talwar"
+    ],
+    "resumo": "Large language models (LLMs) can struggle to memorize factual knowledge in their parameters, often leading to hallucinations and poor performance on knowledge-intensive tasks. In this paper, we formalize fact memorization from an information-theoretic perspective and study how training data distributions affect fact accuracy. We show that fact accuracy is suboptimal (below the capacity limit) whenever the amount of information contained in the training data facts exceeds model capacity. This is further exacerbated when the fact frequency distribution is skewed (e.g. a power law).   We propose data selection schemes based on the training loss alone that aim to limit the number of facts in the training data and flatten their frequency distribution. On semi-synthetic datasets containing high-entropy facts, our selection method effectively boosts fact accuracy to the capacity limit. When pretraining language models from scratch on an annotated Wikipedia corpus, our selection method enables a GPT2-Small model (110m parameters) to memorize 1.3X more entity facts compared to standard training, matching the performance of a 10X larger model (1.3B parameters) pretrained on the full dataset.",
+    "data_publicacao": "2026-04-09T17:55:50+00:00",
+    "arxiv_id": "2604.08519v1",
+    "arquivo_local": "/home/lbr/projetos/ai-engineering-journey/fase1-rag/data/pdfs/Cram_Less_to_Fit_More__Training_Data_Pruning_Improves_Memorization_of_Facts_2604.08519v1.pdf"
+  },
+  {
+    "categoria": "LLM fine-tuning",
+    "titulo": "When Fine-Tuning Changes the Evidence: Architecture-Dependent Semantic Drift in Chest X-Ray Explanations",
+    "autores": [
+      "Kabilan Elangovan",
+      "Daniel Ting"
+    ],
+    "resumo": "Transfer learning followed by fine-tuning is widely adopted in medical image classification due to consistent gains in diagnostic performance. However, in multi-class settings with overlapping visual features, improvements in accuracy do not guarantee stability of the visual evidence used to support predictions. We define semantic drift as systematic changes in the attribution structure supporting a model's predictions between transfer learning and full fine-tuning, reflecting potential shifts in underlying visual reasoning despite stable classification performance. Using a five-class chest X-ray task, we evaluate DenseNet201, ResNet50V2, and InceptionV3 under a two-stage training protocol and quantify drift with reference-free metrics capturing spatial localization and structural consistency of attribution maps. Across architectures, coarse anatomical localization remains stable, while overlap IoU reveals pronounced architecture-dependent reorganization of evidential structure. Beyond single-method analysis, stability rankings can reverse across LayerCAM and GradCAM++ under converged predictive performance, establishing explanation stability as an interaction between architecture, optimization phase, and attribution objective.",
+    "data_publicacao": "2026-04-09T17:53:02+00:00",
+    "arxiv_id": "2604.08513v1",
+    "arquivo_local": "/home/lbr/projetos/ai-engineering-journey/fase1-rag/data/pdfs/When_Fine-Tuning_Changes_the_Evidence__Architecture-Dependent_Semantic_Drift_in_2604.08513v1.pdf"
+  },
+  {
+    "categoria": "LLM fine-tuning",
+    "titulo": "What do Language Models Learn and When? The Implicit Curriculum Hypothesis",
+    "autores": [
+      "Emmy Liu",
+      "Kaiser Sun",
+      "Millicent Li",
+      "Isabelle Lee",
+      "Lindia Tjuatja",
+      "Jen-tse Huang",
+      "Graham Neubig"
+    ],
+    "resumo": "Large language models (LLMs) can perform remarkably complex tasks, yet the fine-grained details of how these capabilities emerge during pretraining remain poorly understood. Scaling laws on validation loss tell us how much a model improves with additional compute, but not what skills it acquires in which order. To remedy this, we propose the Implicit Curriculum Hypothesis: pretraining follows a compositional and predictable curriculum across models and data mixtures. We test this by designing a suite of simple, composable tasks spanning retrieval, morphological transformations, coreference, logical reasoning, and mathematics. Using these tasks, we track emergence points across four model families spanning sizes from 410M-13B parameters. We find that emergence orderings of when models reach fixed accuracy thresholds are strikingly consistent ($ρ= .81$ across 45 model pairs), and that composite tasks most often emerge after their component tasks. Furthermore, we find that this structure is encoded in model representations: tasks with similar function vector representations also tend to follow similar trajectories in training. By using the space of representations derived from our task set, we can effectively predict the training trajectories of simple held-out compositional tasks throughout the course of pretraining ($R^2 = .68$-$.84$ across models) without previously evaluating them. Together, these results suggest that pretraining is more structured than loss curves reveal: skills emerge in a compositional order that is consistent across models and readable from their internals.",
+    "data_publicacao": "2026-04-09T17:50:12+00:00",
+    "arxiv_id": "2604.08510v1",
+    "arquivo_local": "/home/lbr/projetos/ai-engineering-journey/fase1-rag/data/pdfs/What_do_Language_Models_Learn_and_When__The_Implicit_Curriculum_Hypothesis_2604.08510v1.pdf"
+  },
+  {
+    "categoria": "LLM fine-tuning",
+    "titulo": "Quantifying Explanation Consistency: The C-Score Metric for CAM-Based Explainability in Medical Image Classification",
+    "autores": [
+      "Kabilan Elangovan",
+      "Daniel Ting"
+    ],
+    "resumo": "Class Activation Mapping (CAM) methods are widely used to generate visual explanations for deep learning classifiers in medical imaging. However, existing evaluation frameworks assess whether explanations are correct, measured by localisation fidelity against radiologist annotations, rather than whether they are consistent: whether the model applies the same spatial reasoning strategy across different patients with the same pathology. We propose the C-Score (Consistency Score), a confidence-weighted, annotation-free metric that quantifies intra-class explanation reproducibility via intensity-emphasised pairwise soft IoU across correctly classified instances. We evaluate six CAM techniques: GradCAM, GradCAM++, LayerCAM, EigenCAM, ScoreCAM, and MS GradCAM++ across three CNN architectures (DenseNet201, InceptionV3, ResNet50V2) over thirty training epochs on the Kermany chest X-ray dataset, covering transfer learning and fine-tuning phases. We identify three distinct mechanisms of AUC-consistency dissociation, invisible to standard classification metrics: threshold-mediated gold list collapse, technique-specific attribution collapse at peak AUC, and class-level consistency masking in global aggregation. C-Score provides an early warning signal of impending model instability. ScoreCAM deterioration on ResNet50V2 is detectable one full checkpoint before catastrophic AUC collapse and yields architecture-specific clinical deployment recommendations grounded in explanation quality rather than predictive ranking alone.",
+    "data_publicacao": "2026-04-09T17:47:31+00:00",
+    "arxiv_id": "2604.08502v1",
+    "arquivo_local": "/home/lbr/projetos/ai-engineering-journey/fase1-rag/data/pdfs/Quantifying_Explanation_Consistency__The_C-Score_Metric_for_CAM-Based_Explainabi_2604.08502v1.pdf"
+  },
+  {
+    "categoria": "LLM fine-tuning",
+    "titulo": "sciwrite-lint: Verification Infrastructure for the Age of Science Vibe-Writing",
+    "autores": [
+      "Sergey V Samsonau"
+    ],
+    "resumo": "Science currently offers two options for quality assurance, both inadequate. Journal gatekeeping claims to verify both integrity and contribution, but actually measures prestige: peer review is slow, biased, and misses fabricated citations even at top venues. Open science provides no quality assurance at all: the only filter between AI-generated text and the public record is the author's integrity. AI-assisted writing makes both worse by producing more papers faster than either system can absorb.   We propose a third option: measure the paper itself. sciwrite-lint (pip install sciwrite-lint) is an open-source linter for scientific manuscripts that runs entirely on the researcher's machine (free public databases, a single consumer GPU, and open-weights models) with no manuscripts sent to external services. The pipeline verifies that references exist, checks retraction status, compares metadata against canonical records, downloads and parses cited papers, verifies that they support the claims made about them, and follows one level further to check cited papers' own bibliographies. Each reference receives a per-reference reliability score aggregating all verification signals. We evaluate the pipeline on 30 unseen papers from arXiv and bioRxiv with error injection and LLM-adjudicated false positive analysis.   As an experimental extension, we propose SciLint Score, combining integrity verification with a contribution component that operationalizes five frameworks from philosophy of science (Popper, Lakatos, Kitcher, Laudan, Mayo) into computable structural properties of scientific arguments. The integrity component is the core of the tool and is evaluated in this paper; the contribution component is released as experimental code for community development.",
+    "data_publicacao": "2026-04-09T17:46:44+00:00",
+    "arxiv_id": "2604.08501v1",
+    "arquivo_local": "/home/lbr/projetos/ai-engineering-journey/fase1-rag/data/pdfs/sciwrite-lint__Verification_Infrastructure_for_the_Age_of_Science_Vibe-Writing_2604.08501v1.pdf"
+  },
+  {
+    "categoria": "LLM fine-tuning",
+    "titulo": "Figures as Interfaces: Toward LLM-Native Artifacts for Scientific Discovery",
+    "autores": [
+      "Yifang Wang",
+      "Rui Sheng",
+      "Erzhuo Shao",
+      "Yifan Qian",
+      "Haotian Li",
+      "Nan Cao",
+      "Dashun Wang"
+    ],
+    "resumo": "Large language models (LLMs) are transforming scientific workflows, not only through their generative capabilities but also through their emerging ability to use tools, reason about data, and coordinate complex analytical tasks. Yet in most human-AI collaborations, the primary outputs, figures, are still treated as static visual summaries: once rendered, they are handled by both humans and multimodal LLMs as images to be re-interpreted from pixels or captions. The emergent capabilities of LLMs open an opportunity to fundamentally rethink this paradigm. In this paper, we introduce the concept of LLM-native figures: data-driven artifacts that are simultaneously human-legible and machine-addressable. Unlike traditional plots, each artifact embeds complete provenance: the data subset, analytical operations and code, and visualization specification used to generate it. As a result, an LLM can \"see through\" the figure--tracing selections back to their sources, generating code to extend analyses, and orchestrating new visualizations through natural-language instructions or direct manipulation. We implement this concept through a hybrid language-visual interface that integrates LLM agents with a bidirectional mapping between figures and underlying data. Using the science of science domain as a testbed, we demonstrate that LLM-native figures can accelerate discovery, improve reproducibility, and make reasoning transparent across agents and users. More broadly, this work establishes a general framework for embedding provenance, interactivity, and explainability into the artifacts of modern research, redefining the figure not as an end product, but as an interface for discovery. For more details, please refer to the demo video available at www.llm-native-figure.com.",
+    "data_publicacao": "2026-04-09T17:30:58+00:00",
+    "arxiv_id": "2604.08491v1",
+    "arquivo_local": "/home/lbr/projetos/ai-engineering-journey/fase1-rag/data/pdfs/Figures_as_Interfaces__Toward_LLM-Native_Artifacts_for_Scientific_Discovery_2604.08491v1.pdf"
+  }
+]

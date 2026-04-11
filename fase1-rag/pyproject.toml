@@ -1,0 +1,33 @@
+[project]
+name = "fase1-rag"
+version = "0.1.0"
+description = "RAG pipeline local com Ollama, ChromaDB e PyMuPDF"
+requires-python = ">=3.11"
+dependencies = [
+    "chromadb>=0.5.0",
+    "pymupdf>=1.24.0",
+    "ollama>=0.3.0",
+    "pytest>=8.0.0",
+    "arxiv>=2.4.1",
+    "requests>=2.32.5",
+]
+
+[tool.ruff]
+line-length = 88
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+ignore = []
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[dependency-groups]
+dev = [
+    "ruff>=0.15.10",
+]
