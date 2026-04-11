@@ -10,7 +10,6 @@ Uso:
     uv run python -m src.run_eval
 """
 
-import sys
 from pathlib import Path
 
 import chromadb
@@ -30,30 +29,26 @@ COLLECTION_NAME = "papers"
 GENERATION_MODEL = "llama3.2"
 EMBEDDING_MODEL = "nomic-embed-text"
 
-# ── Helpers com import lazy da Fase 1 ────────────────────────────────────────
+# ── Helpers ──────────────────────────────────────────────────────────────────
 
 
 def generate_embedding(text: str, model: str = EMBEDDING_MODEL) -> list[float]:
     """
-    Wrapper lazy para generate_embedding da Fase 1.
+    Gera o embedding de um texto usando Ollama diretamente.
 
-    Faz o import somente quando chamado, evitando falha de ModuleNotFoundError
-    em nível de módulo quando os testes carregam run_eval sem o sys.path da Fase 1.
-    Esta função é um ponto de patch explícito nos testes unitários.
+    Não importa da Fase 1 — chama `ollama.embed` diretamente para evitar
+    conflito de pacotes (ambos os projetos têm um pacote `src`).
+    Esta função é ponto de patch explícito nos testes unitários.
 
     Args:
         text: texto a ser convertido em embedding.
-        model: nome do modelo de embedding.
+        model: nome do modelo de embedding no Ollama.
 
     Returns:
         Vetor de floats representando o texto.
     """
-    fase1_root_str = str(FASE1_ROOT)
-    if fase1_root_str not in sys.path:
-        sys.path.insert(0, fase1_root_str)
-    from src.embeddings import generate_embedding as _gen_emb  # noqa: PLC0415
-
-    return _gen_emb(text, model=model)
+    response = ollama.embed(model=model, input=text)
+    return response.embeddings[0]
 
 
 # ── Funções de integração ─────────────────────────────────────────────────────

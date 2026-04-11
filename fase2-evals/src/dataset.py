@@ -2,22 +2,30 @@
 Gerenciamento do dataset de avaliação.
 
 Cada entrada do dataset contém uma pergunta, a resposta esperada,
-o documento de origem e (opcionalmente) os IDs dos chunks relevantes.
+palavras-chave esperadas nos chunks relevantes, nível de dificuldade
+e (opcionalmente) os IDs dos chunks relevantes para métricas de retrieval.
 """
 
 import json
 from pathlib import Path
-from typing import TypedDict
+from typing import NotRequired, TypedDict
 
 
 class EvalEntry(TypedDict):
-    """Uma entrada do dataset de avaliação."""
+    """
+    Uma entrada do dataset de avaliação.
+
+    Campos obrigatórios: id, question, expected_answer.
+    Campos opcionais: keywords, difficulty, source_document, relevant_chunk_ids.
+    """
 
     id: str
     question: str
     expected_answer: str
-    source_document: str
-    relevant_chunk_ids: list[str]
+    keywords: NotRequired[list[str]]
+    difficulty: NotRequired[str]
+    source_document: NotRequired[str]
+    relevant_chunk_ids: NotRequired[list[str]]
 
 
 # Caminho padrão do dataset
@@ -48,21 +56,25 @@ def load_dataset(path: Path = DEFAULT_DATASET_PATH) -> list[EvalEntry]:
         raise ValueError("O dataset deve ser uma lista JSON de objetos.")
 
     entries: list[EvalEntry] = []
-    required_fields = {"id", "question", "expected_answer", "source_document"}
+    required_fields = {"id", "question", "expected_answer"}
 
     for i, item in enumerate(data):
         missing = required_fields - item.keys()
         if missing:
             raise ValueError(f"Entrada {i} faltando campos: {missing}")
-        entries.append(
-            EvalEntry(
-                id=item["id"],
-                question=item["question"],
-                expected_answer=item["expected_answer"],
-                source_document=item["source_document"],
-                relevant_chunk_ids=item.get("relevant_chunk_ids", []),
-            )
+        entry = EvalEntry(
+            id=item["id"],
+            question=item["question"],
+            expected_answer=item["expected_answer"],
         )
+        if "keywords" in item:
+            entry["keywords"] = item["keywords"]
+        if "difficulty" in item:
+            entry["difficulty"] = item["difficulty"]
+        if "source_document" in item:
+            entry["source_document"] = item["source_document"]
+        entry["relevant_chunk_ids"] = item.get("relevant_chunk_ids", [])
+        entries.append(entry)
 
     return entries
 
