@@ -20,6 +20,9 @@ fase1-rag/chroma_db/
 # Variáveis de ambiente
 .env
 .env.*
+*.env
+*secret*
+*api_key*
 
 # Pytest / coverage
 .pytest_cache/
@@ -28,6 +31,9 @@ htmlcov/
 
 # Ruff
 .ruff_cache/
+
+# uv
+uv.lock
 
 # IDEs
 .vscode/
