@@ -1,0 +1,122 @@
+[
+  {
+    "id": "q001",
+    "question": "What is Retrieval-Augmented Generation (RAG)?",
+    "expected_answer": "RAG is a technique that combines a retrieval system with a generative language model. It retrieves relevant documents from an external knowledge base and provides them as context to the LLM, allowing it to generate more accurate and grounded answers without retraining.",
+    "keywords": ["retrieval", "augmented", "generation", "knowledge base", "context"],
+    "difficulty": "easy",
+    "relevant_chunk_ids": []
+  },
+  {
+    "id": "q002",
+    "question": "What is text chunking in the context of RAG pipelines?",
+    "expected_answer": "Chunking is the process of splitting long documents into smaller, overlapping text segments before indexing. It ensures that individual pieces fit within the embedding model's context window and that semantically coherent units are stored and retrieved together.",
+    "keywords": ["chunking", "chunk", "splitting", "overlap", "segment"],
+    "difficulty": "easy",
+    "relevant_chunk_ids": []
+  },
+  {
+    "id": "q003",
+    "question": "What is a vector embedding in the context of semantic search?",
+    "expected_answer": "A vector embedding is a numerical representation of text in a high-dimensional space where semantically similar texts are close together. Embedding models convert text into these vectors, enabling similarity search by computing distances between vectors.",
+    "keywords": ["embedding", "vector", "semantic", "similarity", "dimensional"],
+    "difficulty": "easy",
+    "relevant_chunk_ids": []
+  },
+  {
+    "id": "q004",
+    "question": "What is a vector database and why is it used in RAG?",
+    "expected_answer": "A vector database (e.g., ChromaDB, Pinecone, Weaviate) is a storage system optimized for storing and querying high-dimensional vectors. In RAG, it stores document embeddings and enables fast approximate nearest-neighbor search to find relevant chunks for a given query.",
+    "keywords": ["vector database", "ChromaDB", "nearest neighbor", "index", "embeddings"],
+    "difficulty": "easy",
+    "relevant_chunk_ids": []
+  },
+  {
+    "id": "q005",
+    "question": "What is the difference between a foundation model and a fine-tuned model?",
+    "expected_answer": "A foundation model is pre-trained on large general-purpose datasets and can perform a wide range of tasks. A fine-tuned model starts from a foundation model and is further trained on a smaller, task-specific dataset to improve performance on a particular domain or task.",
+    "keywords": ["foundation model", "fine-tuning", "pre-trained", "task-specific", "adaptation"],
+    "difficulty": "easy",
+    "relevant_chunk_ids": []
+  },
+  {
+    "id": "q006",
+    "question": "How does semantic retrieval differ from keyword-based retrieval (BM25)?",
+    "expected_answer": "Keyword-based retrieval (BM25) matches documents by exact word overlap and term frequency, while semantic retrieval converts both query and documents to vectors and finds matches by cosine similarity in embedding space. Semantic retrieval handles synonyms and paraphrases but requires more compute; BM25 is faster and works well when exact terms matter.",
+    "keywords": ["BM25", "sparse retrieval", "dense retrieval", "cosine similarity", "term frequency"],
+    "difficulty": "medium",
+    "relevant_chunk_ids": []
+  },
+  {
+    "id": "q007",
+    "question": "How do LLM agents use tools to extend their capabilities?",
+    "expected_answer": "LLM agents are equipped with a set of tools (e.g., search engines, calculators, code interpreters) that they can call when needed. The agent uses the LLM to plan which tool to invoke and with what arguments, processes the tool output, and iterates until the task is complete. This pattern is known as ReAct or function calling.",
+    "keywords": ["agent", "tool", "function calling", "ReAct", "planning"],
+    "difficulty": "medium",
+    "relevant_chunk_ids": []
+  },
+  {
+    "id": "q008",
+    "question": "What is the role of a reranker in a RAG pipeline?",
+    "expected_answer": "A reranker is a cross-encoder model applied after initial retrieval. It re-scores the top-K retrieved chunks by jointly encoding the query and each chunk, producing a more accurate relevance score than the initial bi-encoder. Rerankers improve precision at the cost of higher latency.",
+    "keywords": ["reranker", "cross-encoder", "bi-encoder", "reranking", "relevance"],
+    "difficulty": "medium",
+    "relevant_chunk_ids": []
+  },
+  {
+    "id": "q009",
+    "question": "What is instruction tuning and how does it improve LLM behavior?",
+    "expected_answer": "Instruction tuning is a fine-tuning technique where the model is trained on (instruction, response) pairs, teaching it to follow natural language instructions. It improves alignment between user intent and model output without requiring task-specific prompts for every use case.",
+    "keywords": ["instruction tuning", "RLHF", "alignment", "instruction following", "fine-tuning"],
+    "difficulty": "medium",
+    "relevant_chunk_ids": []
+  },
+  {
+    "id": "q010",
+    "question": "What is the difference between extractive and abstractive QA in RAG?",
+    "expected_answer": "Extractive QA returns a verbatim span copied from a retrieved document. Abstractive QA generates a new answer synthesizing information from retrieved context, potentially combining multiple sources and paraphrasing. RAG with LLMs typically performs abstractive QA, which is more flexible but also more prone to hallucination.",
+    "keywords": ["extractive", "abstractive", "question answering", "span extraction", "synthesis"],
+    "difficulty": "medium",
+    "relevant_chunk_ids": []
+  },
+  {
+    "id": "q011",
+    "question": "When does RAG fail to produce accurate answers despite correct retrieval?",
+    "expected_answer": "RAG can fail even with correct retrieval when: the retrieved context is too long and the LLM loses information in the middle (lost-in-the-middle problem); the answer requires integrating information across many chunks that don't fit in context; the LLM ignores the context and relies on parametric memory; or the question requires multi-hop reasoning across disconnected chunks.",
+    "keywords": ["lost in the middle", "hallucination", "multi-hop", "context length", "parametric memory"],
+    "difficulty": "hard",
+    "relevant_chunk_ids": []
+  },
+  {
+    "id": "q012",
+    "question": "What are the limitations of using small chunk sizes in RAG?",
+    "expected_answer": "Small chunks increase recall (more specific matches) but lack context for the LLM to understand the meaning — a sentence without its surrounding paragraph may be ambiguous. They also increase retrieval noise, force more chunks to be included to cover a topic, and can break semantic units like lists or multi-sentence arguments.",
+    "keywords": ["chunk size", "context window", "granularity", "recall", "semantic unit"],
+    "difficulty": "hard",
+    "relevant_chunk_ids": []
+  },
+  {
+    "id": "q013",
+    "question": "What is the context window problem in LLMs and how does it affect RAG?",
+    "expected_answer": "The context window is the maximum number of tokens an LLM can process at once. In RAG, if retrieved chunks are long or many, they may overflow the context window. Research shows LLMs perform best on information at the beginning and end of context (lost-in-the-middle effect), so chunk ordering and selection strategies matter significantly.",
+    "keywords": ["context window", "token limit", "lost in the middle", "attention", "truncation"],
+    "difficulty": "hard",
+    "relevant_chunk_ids": []
+  },
+  {
+    "id": "q014",
+    "question": "What are the trade-offs between RAG and fine-tuning for domain adaptation?",
+    "expected_answer": "RAG is better for dynamic or frequently updated knowledge, provides source attribution, and doesn't require retraining. Fine-tuning is better for teaching the model reasoning patterns, style, or tasks not present in training data. Fine-tuning requires labeled data, compute, and risks catastrophic forgetting. Many production systems combine both: fine-tune for behavior, RAG for knowledge.",
+    "keywords": ["RAG vs fine-tuning", "domain adaptation", "catastrophic forgetting", "knowledge", "parametric"],
+    "difficulty": "hard",
+    "relevant_chunk_ids": []
+  },
+  {
+    "id": "q015",
+    "question": "What is catastrophic forgetting in continual learning of LLMs?",
+    "expected_answer": "Catastrophic forgetting occurs when an LLM fine-tuned on new data overwrites weights that encoded previously learned knowledge, degrading performance on earlier tasks. Mitigation strategies include elastic weight consolidation (EWC), replay buffers, adapter layers, and LoRA (Low-Rank Adaptation), which freezes most weights and trains small adapter modules.",
+    "keywords": ["catastrophic forgetting", "continual learning", "LoRA", "elastic weight consolidation", "adapter"],
+    "difficulty": "hard",
+    "relevant_chunk_ids": []
+  }
+]
