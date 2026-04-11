@@ -24,17 +24,17 @@ Sistema de avaliação quantitativa para o pipeline RAG da Fase 1, executado de 
 
 Primeiro experimento real com 15 perguntas, llama3.2 + nomic-embed-text + 4.110 chunks:
 
-| Métrica | Valor |
-|---|---|
-| Recall@5 médio | 0.00 (sem anotação de chunk IDs) |
-| MRR médio | 0.00 (sem anotação de chunk IDs) |
-| Faithfulness médio | 0.57 (amarelo) |
-| Answer Relevance médio | 0.60 (amarelo) |
+| Métrica | Valor | Observação |
+|---|---|---|
+| Faithfulness médio | **0.57** | Modelo às vezes vai além do contexto recuperado |
+| Answer Relevance médio | **0.60** | Respostas nem sempre respondem diretamente à pergunta |
+| Recall@5 médio | não coletado | ChromaDB não expôs documentos relevantes ground-truth |
+| MRR médio | não coletado | Requer anotação manual de `relevant_chunk_ids` |
 
-- **Pergunta com melhor performance:** q001, q003, q005, q007, q009, q011, q015 — Faithfulness 0.80
-- **Pergunta com pior performance:** q002 (Answer Relevance 0.00), q004 e q012 (Faithfulness 0.00)
-- **Insight surpreendente:** perguntas hard tiveram Answer Relevance melhor que easy (0.72 vs 0.58)
-  — perguntas técnicas de trade-off se alinham melhor com o corpus de papers do ArXiv
+- **Perguntas com melhor performance:** q001, q003, q005, q007, q009, q011, q015 — Faithfulness 0.80
+- **Perguntas com pior performance:** q002 (Answer Relevance 0.00), q004 e q012 (Faithfulness 0.00)
+- **Insight principal:** perguntas hard sobre trade-offs tiveram Answer Relevance 0.72 vs 0.58 das
+  easy — o corpus de papers técnicos favorece discussões de limitações, não definições básicas
 
 ---
 
