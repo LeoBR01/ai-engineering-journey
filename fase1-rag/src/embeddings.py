@@ -16,6 +16,7 @@ import ollama
 EMBEDDING_MODEL = "nomic-embed-text"
 CHROMA_COLLECTION = "papers"
 CHROMA_PATH = "./chroma_db"
+BATCH_SIZE = 500  # ChromaDB tem limite de ~5461 itens por chamada; 500 é seguro
 
 
 def get_chroma_collection(
@@ -54,10 +55,10 @@ def store_chunks(
     chunks: list[dict[str, str | int]],
     collection: chromadb.Collection,
 ) -> None:
-    """Gera embeddings e armazena chunks no ChromaDB em lote.
+    """Gera embeddings e armazena chunks no ChromaDB em lotes de BATCH_SIZE.
 
-    Cada chunk vira um documento no ChromaDB com seu vetor de embedding,
-    o texto original e metadados (arquivo de origem e página).
+    Processa os chunks em lotes para respeitar o limite interno do ChromaDB
+    (~5461 itens por chamada). Exibe progresso por lote.
 
     Args:
         chunks: lista de dicts com 'text', 'source', 'page' e 'chunk_id'.
@@ -66,14 +67,23 @@ def store_chunks(
     if not chunks:
         return
 
-    embeddings = [generate_embedding(c["text"]) for c in chunks]
+    total = len(chunks)
+    n_batches = (total + BATCH_SIZE - 1) // BATCH_SIZE
 
-    collection.add(
-        ids=[c["chunk_id"] for c in chunks],
-        documents=[c["text"] for c in chunks],
-        embeddings=embeddings,
-        metadatas=[{"source": c["source"], "page": c.get("page", 0)} for c in chunks],
-    )
+    for batch_num, start in enumerate(range(0, total, BATCH_SIZE), 1):
+        batch = chunks[start : start + BATCH_SIZE]
+        print(f"  Indexando lote {batch_num}/{n_batches} ({len(batch)} chunks)...")
+
+        embeddings = [generate_embedding(c["text"]) for c in batch]
+
+        collection.add(
+            ids=[c["chunk_id"] for c in batch],
+            documents=[c["text"] for c in batch],
+            embeddings=embeddings,
+            metadatas=[
+                {"source": c["source"], "page": c.get("page", 0)} for c in batch
+            ],
+        )
 
 
 def get_collection() -> chromadb.Collection:
