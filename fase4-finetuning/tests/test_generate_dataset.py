@@ -1,5 +1,9 @@
 """Testes para geração de dataset de fine-tuning."""
 
+import json
+import tempfile
+from pathlib import Path
+
 from src.generate_dataset import (
     RagPair,
     filter_rag_pair,
@@ -7,6 +11,7 @@ from src.generate_dataset import (
     generate_rag_pair,
     generate_react_cycle,
     pair_to_chatml_rag,
+    preprocess_dataset,
 )
 
 
@@ -240,3 +245,125 @@ class TestGenerateReactCycle:
         )
 
         assert result["messages"][0]["content"] == "unique_system_prompt_xyz"
+
+
+class TestPreprocessDataset:
+    def _write_jsonl(self, path: Path, items: list[dict]) -> None:
+        with open(path, "w") as f:
+            for item in items:
+                f.write(json.dumps(item) + "\n")
+
+    def test_output_files_created(self) -> None:
+        rag_item = {
+            "messages": [
+                {"role": "user", "content": "q"},
+                {"role": "assistant", "content": "a"},
+            ]
+        }
+        react_item = {
+            "messages": [
+                {"role": "user", "content": "q2"},
+                {"role": "assistant", "content": "a2"},
+            ]
+        }
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            rag_path = Path(tmpdir) / "rag.jsonl"
+            react_path = Path(tmpdir) / "react.jsonl"
+            output_path = Path(tmpdir) / "processed" / "train.jsonl"
+
+            self._write_jsonl(rag_path, [rag_item] * 10)
+            self._write_jsonl(react_path, [react_item] * 10)
+
+            result = preprocess_dataset(
+                str(rag_path), str(react_path), str(output_path)
+            )
+
+            assert output_path.exists()
+            assert (output_path.parent / "val.jsonl").exists()
+            assert "train" in result
+            assert "val" in result
+
+    def test_total_count_preserved(self) -> None:
+        rag_item = {
+            "messages": [
+                {"role": "user", "content": "q"},
+                {"role": "assistant", "content": "a"},
+            ]
+        }
+        react_item = {
+            "messages": [
+                {"role": "user", "content": "q2"},
+                {"role": "assistant", "content": "a2"},
+            ]
+        }
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            rag_path = Path(tmpdir) / "rag.jsonl"
+            react_path = Path(tmpdir) / "react.jsonl"
+            output_path = Path(tmpdir) / "processed" / "train.jsonl"
+
+            self._write_jsonl(rag_path, [rag_item] * 100)
+            self._write_jsonl(react_path, [react_item] * 100)
+
+            result = preprocess_dataset(
+                str(rag_path), str(react_path), str(output_path)
+            )
+
+            assert result["train"] + result["val"] == 200
+
+    def test_val_ratio_respected(self) -> None:
+        rag_item = {
+            "messages": [
+                {"role": "user", "content": "q"},
+                {"role": "assistant", "content": "a"},
+            ]
+        }
+        react_item = {
+            "messages": [
+                {"role": "user", "content": "q2"},
+                {"role": "assistant", "content": "a2"},
+            ]
+        }
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            rag_path = Path(tmpdir) / "rag.jsonl"
+            react_path = Path(tmpdir) / "react.jsonl"
+            output_path = Path(tmpdir) / "processed" / "train.jsonl"
+
+            self._write_jsonl(rag_path, [rag_item] * 50)
+            self._write_jsonl(react_path, [react_item] * 50)
+
+            result = preprocess_dataset(
+                str(rag_path), str(react_path), str(output_path), val_ratio=0.1
+            )
+
+            assert result["val"] == 10  # 10% of 100
+
+    def test_reproducible_with_same_seed(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            rag_path = Path(tmpdir) / "rag.jsonl"
+            react_path = Path(tmpdir) / "react.jsonl"
+
+            self._write_jsonl(
+                rag_path,
+                [
+                    {"messages": [{"role": "user", "content": str(i)}]}
+                    for i in range(30)
+                ],
+            )
+            self._write_jsonl(
+                react_path,
+                [
+                    {"messages": [{"role": "user", "content": str(i + 100)}]}
+                    for i in range(30)
+                ],
+            )
+
+            output1 = Path(tmpdir) / "out1" / "train.jsonl"
+            output2 = Path(tmpdir) / "out2" / "train.jsonl"
+
+            preprocess_dataset(str(rag_path), str(react_path), str(output1), seed=42)
+            preprocess_dataset(str(rag_path), str(react_path), str(output2), seed=42)
+
+            assert output1.read_text() == output2.read_text()

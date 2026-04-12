@@ -10,7 +10,9 @@ Uso:
                             --processed-output data/processed/train.jsonl
 """
 
+import json
 import logging
+import sys
 from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
@@ -200,3 +202,283 @@ def pair_to_chatml_react(cycle: dict) -> dict:
         O mesmo dict (identidade).
     """
     return cycle
+
+
+def preprocess_dataset(
+    rag_path: str,
+    react_path: str,
+    output_path: str,
+    rag_ratio: float = 0.6,
+    val_ratio: float = 0.1,
+    seed: int = 42,
+) -> dict[str, int]:
+    """Combina, balanceia e divide os datasets RAG e ReAct.
+
+    Realiza shuffle determinístico e split treino/validação.
+
+    Args:
+        rag_path: caminho para rag_pairs.jsonl.
+        react_path: caminho para react_cycles.jsonl.
+        output_path: caminho para train.jsonl de saída.
+        rag_ratio: fração do total a ser preenchida com exemplos RAG.
+        val_ratio: fração a ser separada para validação.
+        seed: semente para reprodutibilidade.
+
+    Returns:
+        Dict com contagens {'train': N, 'val': M}.
+    """
+    import random
+
+    def _read_jsonl(path: str) -> list[dict]:
+        return [
+            json.loads(line)
+            for line in Path(path).read_text(encoding="utf-8").strip().splitlines()
+            if line.strip()
+        ]
+
+    rag_examples = _read_jsonl(rag_path)
+    react_examples = _read_jsonl(react_path)
+
+    # Balancear proporções: calcular targets com base no menor lado disponível
+    total = len(rag_examples) + len(react_examples)
+    target_rag = int(total * rag_ratio)
+    target_react = total - target_rag
+
+    random.seed(seed)
+    # Ajustar se um dos lados não tem exemplos suficientes
+    if len(rag_examples) < target_rag:
+        target_rag = len(rag_examples)
+        target_react = min(len(react_examples), total - target_rag)
+    elif len(react_examples) < target_react:
+        target_react = len(react_examples)
+        target_rag = min(len(rag_examples), total - target_react)
+
+    if len(rag_examples) > target_rag:
+        rag_examples = random.sample(rag_examples, target_rag)
+    if len(react_examples) > target_react:
+        react_examples = random.sample(react_examples, target_react)
+
+    all_examples = rag_examples + react_examples
+    random.shuffle(all_examples)
+
+    # Split treino/validação
+    val_size = int(len(all_examples) * val_ratio)
+    val_examples = all_examples[:val_size]
+    train_examples = all_examples[val_size:]
+
+    # Salvar
+    out_path = Path(output_path)
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    val_path = out_path.parent / "val.jsonl"
+
+    with open(out_path, "w", encoding="utf-8") as f:
+        for ex in train_examples:
+            f.write(json.dumps(ex, ensure_ascii=False) + "\n")
+
+    with open(val_path, "w", encoding="utf-8") as f:
+        for ex in val_examples:
+            f.write(json.dumps(ex, ensure_ascii=False) + "\n")
+
+    return {"train": len(train_examples), "val": len(val_examples)}
+
+
+def _make_default_llm_fn(model: str = GENERATION_MODEL) -> Callable[[str], str]:
+    """Cria uma função LLM usando ollama.chat."""
+    import ollama
+
+    def llm_fn(prompt: str) -> str:
+        response = ollama.chat(
+            model=model,
+            messages=[{"role": "user", "content": prompt}],
+        )
+        return response.message.content
+
+    return llm_fn
+
+
+def _make_default_search_fn() -> Callable[[str], list[dict]]:
+    """Cria a função de busca usando o search_papers da Fase 3."""
+    fase3_src = Path(__file__).resolve().parent.parent.parent / "fase3-agents" / "src"
+    if str(fase3_src) not in sys.path:
+        sys.path.insert(0, str(fase3_src.parent))
+
+    from src.tools import search_papers  # noqa: PLC0415
+
+    return search_papers
+
+
+def _make_default_generate_fn(
+    model: str = GENERATION_MODEL,
+) -> Callable[[str, str], str]:
+    """Cria a função generate para ciclos ReAct."""
+    import ollama
+
+    def generate_fn(question: str, context: str) -> str:
+        system = (
+            "Answer the question based only on the provided context. "
+            "Be concise and factual.\n\nContext:\n" + context
+        )
+        response = ollama.chat(
+            model=model,
+            messages=[
+                {"role": "system", "content": system},
+                {"role": "user", "content": question},
+            ],
+        )
+        return response.message.content
+
+    return generate_fn
+
+
+def generate_rag_dataset(
+    output_path: str,
+    chroma_path: str = CHROMA_PATH,
+    collection_name: str = COLLECTION_NAME,
+    max_pairs: int = 800,
+    sample_every: int = 5,
+    model: str = GENERATION_MODEL,
+    llm_fn: Callable[[str], str] | None = None,
+) -> int:
+    """Gera o dataset de pares RAG a partir do ChromaDB da Fase 1.
+
+    Args:
+        output_path: caminho para salvar rag_pairs.jsonl.
+        chroma_path: caminho para o ChromaDB.
+        collection_name: nome da collection no ChromaDB.
+        max_pairs: número máximo de pares a gerar.
+        sample_every: amostrar 1 em cada N chunks (para reduzir tempo).
+        model: nome do modelo Ollama.
+        llm_fn: função LLM para injeção em testes (usa Ollama se None).
+
+    Returns:
+        Número de pares gerados e salvos.
+    """
+    import chromadb
+
+    if llm_fn is None:
+        llm_fn = _make_default_llm_fn(model)
+
+    client = chromadb.PersistentClient(path=chroma_path)
+    collection = client.get_collection(name=collection_name)
+    all_docs = collection.get(include=["documents"])
+
+    documents = all_docs.get("documents", [])
+    sampled = documents[::sample_every][:max_pairs]
+
+    pairs = []
+    for i, chunk in enumerate(sampled):
+        logger.info("RAG pair %d/%d", i + 1, len(sampled))
+        pair = generate_rag_pair(chunk, llm_fn)
+        if pair:
+            pairs.append(pair_to_chatml_rag(pair))
+
+    Path(output_path).parent.mkdir(parents=True, exist_ok=True)
+    with open(output_path, "w", encoding="utf-8") as f:
+        for p in pairs:
+            f.write(json.dumps(p, ensure_ascii=False) + "\n")
+
+    return len(pairs)
+
+
+def generate_react_dataset(
+    output_path: str,
+    questions: list[str] | None = None,
+    search_fn: Callable[[str], list[dict]] | None = None,
+    generate_fn: Callable[[str, str], str] | None = None,
+    model: str = GENERATION_MODEL,
+) -> int:
+    """Gera o dataset de ciclos ReAct usando busca real + LLM.
+
+    Args:
+        output_path: caminho para salvar react_cycles.jsonl.
+        questions: lista de perguntas seed (usa default se None).
+        search_fn: função de busca (usa search_papers da Fase 3 se None).
+        generate_fn: função de geração (usa Ollama se None).
+        model: nome do modelo Ollama.
+
+    Returns:
+        Número de ciclos gerados e salvos.
+    """
+    if questions is None:
+        questions = _default_react_questions()
+
+    if search_fn is None:
+        search_fn = _make_default_search_fn()
+
+    if generate_fn is None:
+        generate_fn = _make_default_generate_fn(model)
+
+    # Importar SYSTEM_PROMPT da Fase 3
+    fase3_src = Path(__file__).resolve().parent.parent.parent / "fase3-agents"
+    if str(fase3_src) not in sys.path:
+        sys.path.insert(0, str(fase3_src))
+
+    from src.prompt import SYSTEM_PROMPT  # noqa: PLC0415
+
+    cycles = []
+    for i, question in enumerate(questions):
+        logger.info("ReAct cycle %d/%d: %s", i + 1, len(questions), question[:50])
+        cycle = generate_react_cycle(question, search_fn, generate_fn, SYSTEM_PROMPT)
+        cycles.append(cycle)
+
+    Path(output_path).parent.mkdir(parents=True, exist_ok=True)
+    with open(output_path, "w", encoding="utf-8") as f:
+        for c in cycles:
+            f.write(json.dumps(c, ensure_ascii=False) + "\n")
+
+    return len(cycles)
+
+
+def _default_react_questions() -> list[str]:
+    """Carrega perguntas do dataset da Fase 2 como seed para ciclos ReAct."""
+    fase2_dataset = (
+        Path(__file__).resolve().parent.parent.parent
+        / "fase2-evals"
+        / "data"
+        / "eval_dataset.json"
+    )
+    if fase2_dataset.exists():
+        entries = json.loads(fase2_dataset.read_text(encoding="utf-8"))
+        return [e["question"] for e in entries]
+
+    # Fallback se o dataset não estiver disponível
+    return [
+        "What are the main advantages of retrieval-augmented generation?",
+        "How does the attention mechanism work in transformer models?",
+        "What metrics are commonly used to evaluate language models?",
+        "How does LoRA reduce the number of trainable parameters?",
+        "What is the difference between RAG and fine-tuning?",
+    ]
+
+
+def main() -> None:
+    """CLI para geração do dataset completo."""
+    import argparse
+
+    logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
+
+    parser = argparse.ArgumentParser(description="Gera dataset de fine-tuning")
+    parser.add_argument("--rag-output", default="data/raw/rag_pairs.jsonl")
+    parser.add_argument("--react-output", default="data/raw/react_cycles.jsonl")
+    parser.add_argument("--processed-output", default="data/processed/train.jsonl")
+    parser.add_argument("--max-rag-pairs", type=int, default=800)
+    parser.add_argument("--model", default=GENERATION_MODEL)
+    args = parser.parse_args()
+
+    logger.info("Gerando RAG pairs...")
+    n_rag = generate_rag_dataset(
+        args.rag_output, max_pairs=args.max_rag_pairs, model=args.model
+    )
+    logger.info("RAG pairs gerados: %d", n_rag)
+
+    logger.info("Gerando ciclos ReAct...")
+    n_react = generate_react_dataset(args.react_output, model=args.model)
+    logger.info("Ciclos ReAct gerados: %d", n_react)
+
+    logger.info("Preprocessando dataset...")
+    counts = preprocess_dataset(
+        args.rag_output, args.react_output, args.processed_output
+    )
+    logger.info(
+        "Dataset final: %d treino, %d validação", counts["train"], counts["val"]
+    )
