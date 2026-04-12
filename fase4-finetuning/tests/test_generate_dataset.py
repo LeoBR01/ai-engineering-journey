@@ -3,7 +3,9 @@
 from src.generate_dataset import (
     RagPair,
     filter_rag_pair,
+    format_observation,
     generate_rag_pair,
+    generate_react_cycle,
     pair_to_chatml_rag,
 )
 
@@ -114,3 +116,127 @@ class TestPairToChatml:
         )
         result = pair_to_chatml_rag(pair)
         assert result["messages"][2]["content"] == "unique_answer_xyz"
+
+
+class TestFormatObservation:
+    def test_formats_top_3_results(self) -> None:
+        results = [
+            {"content": "Result one about transformers."},
+            {"content": "Result two about attention."},
+            {"content": "Result three about BERT."},
+            {"content": "Result four should be excluded."},
+        ]
+        observation = format_observation(results)
+        assert "[1]" in observation
+        assert "[2]" in observation
+        assert "[3]" in observation
+        assert "[4]" not in observation
+
+    def test_empty_results_returns_fallback(self) -> None:
+        observation = format_observation([])
+        assert "Nenhum resultado encontrado" in observation
+
+    def test_content_truncated_to_300_chars(self) -> None:
+        long_content = "x" * 500
+        results = [{"content": long_content}]
+        observation = format_observation(results)
+        # 300 chars + prefix "[1] "
+        assert len(observation) <= 310
+
+
+class TestGenerateReactCycle:
+    def test_cycle_has_correct_chatml_structure(self) -> None:
+        def search_fn(query: str) -> list[dict]:
+            return [{"content": "Relevant paper content about the topic."}]
+
+        def generate_fn(question: str, context: str) -> str:
+            return "The answer based on the retrieved context."
+
+        result = generate_react_cycle(
+            question="What is attention mechanism?",
+            search_fn=search_fn,
+            generate_fn=generate_fn,
+            system_prompt="You are a ReAct agent.",
+        )
+
+        assert "messages" in result
+        assert len(result["messages"]) == 3
+        roles = [m["role"] for m in result["messages"]]
+        assert roles == ["system", "user", "assistant"]
+
+    def test_assistant_message_has_react_keywords(self) -> None:
+        def search_fn(query: str) -> list[dict]:
+            return [{"content": "Paper content."}]
+
+        def generate_fn(question: str, context: str) -> str:
+            return "Final answer here."
+
+        result = generate_react_cycle(
+            question="How does RAG work?",
+            search_fn=search_fn,
+            generate_fn=generate_fn,
+            system_prompt="System prompt.",
+        )
+        assistant_content = result["messages"][2]["content"]
+
+        assert "Thought:" in assistant_content
+        assert "Action: search_papers" in assistant_content
+        assert "Action Input:" in assistant_content
+        assert "Observation:" in assistant_content
+        assert "Final Answer:" in assistant_content
+
+    def test_search_fn_called_with_question(self) -> None:
+        captured_queries = []
+
+        def search_fn(query: str) -> list[dict]:
+            captured_queries.append(query)
+            return [{"content": "Some content."}]
+
+        def generate_fn(question: str, context: str) -> str:
+            return "Answer."
+
+        generate_react_cycle(
+            question="unique_question_marker",
+            search_fn=search_fn,
+            generate_fn=generate_fn,
+            system_prompt="Prompt.",
+        )
+
+        assert len(captured_queries) == 1
+        assert "unique_question_marker" in captured_queries[0]
+
+    def test_generate_fn_called_with_observation(self) -> None:
+        captured_contexts = []
+
+        def search_fn(query: str) -> list[dict]:
+            return [{"content": "unique_content_xyz"}]
+
+        def generate_fn(question: str, context: str) -> str:
+            captured_contexts.append(context)
+            return "Answer."
+
+        generate_react_cycle(
+            question="Question?",
+            search_fn=search_fn,
+            generate_fn=generate_fn,
+            system_prompt="Prompt.",
+        )
+
+        assert len(captured_contexts) == 1
+        assert "unique_content_xyz" in captured_contexts[0]
+
+    def test_system_prompt_in_first_message(self) -> None:
+        def search_fn(query: str) -> list[dict]:
+            return []
+
+        def generate_fn(question: str, context: str) -> str:
+            return "Answer."
+
+        result = generate_react_cycle(
+            question="Q?",
+            search_fn=search_fn,
+            generate_fn=generate_fn,
+            system_prompt="unique_system_prompt_xyz",
+        )
+
+        assert result["messages"][0]["content"] == "unique_system_prompt_xyz"

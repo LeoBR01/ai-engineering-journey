@@ -137,3 +137,66 @@ def format_observation(search_results: list[dict]) -> str:
         content = result.get("content", "")
         parts.append(f"[{i}] {content[:300]}")
     return "\n\n".join(parts)
+
+
+def generate_react_cycle(
+    question: str,
+    search_fn: Callable[[str], list[dict]],
+    generate_fn: Callable[[str, str], str],
+    system_prompt: str,
+) -> dict:
+    """Gera um ciclo ReAct completo e bem-formado para fine-tuning.
+
+    Em vez de capturar saídas do modelo atual (que tem formato inconsistente),
+    constrói o ciclo programaticamente usando resultados reais do search_papers
+    e respostas geradas pelo LLM. Isso garante exemplos com formato perfeito.
+
+    Args:
+        question: pergunta que o agente deve responder.
+        search_fn: função de busca semântica (retorna list[dict] com 'content').
+        generate_fn: função que gera resposta dado (question, context).
+        system_prompt: prompt de sistema para o papel 'system' do ChatML.
+
+    Returns:
+        Dict no formato ChatML com ciclo ReAct completo.
+    """
+    # Executar busca real para obter observação autêntica
+    search_results = search_fn(question)
+    observation = format_observation(search_results)
+
+    # Gerar resposta final baseada no contexto recuperado
+    final_answer = generate_fn(question, observation)
+
+    # Construir ciclo com formato perfeito
+    assistant_content = (
+        "Thought: I need to search the research papers to find relevant "
+        f"information about this question.\n"
+        f"Action: search_papers\n"
+        f"Action Input: {question}\n"
+        f"Observation: {observation}\n"
+        "Thought: Based on the search results, I have enough information "
+        "to provide an accurate answer.\n"
+        f"Final Answer: {final_answer}"
+    )
+
+    return {
+        "messages": [
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": question},
+            {"role": "assistant", "content": assistant_content},
+        ]
+    }
+
+
+def pair_to_chatml_react(cycle: dict) -> dict:
+    """Passa o ciclo direto — já está em formato ChatML.
+
+    Existe para simetria com pair_to_chatml_rag e para facilitar testes.
+
+    Args:
+        cycle: dict já no formato ChatML retornado por generate_react_cycle.
+
+    Returns:
+        O mesmo dict (identidade).
+    """
+    return cycle
