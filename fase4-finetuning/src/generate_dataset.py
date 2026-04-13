@@ -230,9 +230,12 @@ def preprocess_dataset(
     import random
 
     def _read_jsonl(path: str) -> list[dict]:
+        # Usar split("\n") em vez de splitlines() para evitar que caracteres
+        # Unicode U+2028/U+2029 (line separators) gerados pelo LLM com
+        # ensure_ascii=False partam um objeto JSON no meio.
         return [
             json.loads(line)
-            for line in Path(path).read_text(encoding="utf-8").strip().splitlines()
+            for line in Path(path).read_text(encoding="utf-8").split("\n")
             if line.strip()
         ]
 
