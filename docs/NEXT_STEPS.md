@@ -7,7 +7,8 @@
 | Fase 1 | Pipeline RAG | ✅ Completo |
 | Fase 2 | Sistema de Evals | ✅ Completo |
 | Fase 3 | Agente ReAct | ✅ Completo |
-| Fase 4 | Fine-tuning | 🔜 Próxima |
+| Fase 4 | Fine-tuning QLoRA | ✅ Completo |
+| Fase 5 | Produção | 🔜 Próxima |
 
 ---
 
@@ -59,57 +60,70 @@ Usa o pipeline RAG da Fase 1 como ferramenta de busca para perguntas multi-hop.
 **Destaques:**
 - `calculate` usa `ast.parse` + caminhamento da AST — rejeita `Call`, `Import`, atributos
 - `SYSTEM_PROMPT` enviado no campo `system` do `ollama.chat` para maior autoridade
-- Gatilho explícito de busca obrigatória no passo 1 (elimina alucinação sem retrieval)
 - Loop tolera saída malformada do LLM e continua sem travar
 - 30 testes unitários, todos mockados, todos passando
 
-**Resultado dos testes reais (2026-04-12):** ciclo Thought → Action: search_papers → Observation → Final Answer
-confirmado nas duas perguntas de teste. Qualidade da resposta limitada pelo corpus, não pelo agente.
+---
+
+## ✅ Fase 4 — Fine-tuning QLoRA (completo)
+
+Fine-tuning supervisionado (SFT) com QLoRA no llama3.2 3B para melhorar
+qualidade RAG e aderência ao formato ReAct.
+
+| Módulo | Função |
+|---|---|
+| `generate_dataset.py` | Pares RAG sintéticos + ciclos ReAct programáticos |
+| `train.py` | QLoRA com Unsloth/TRL, `TrainConfig`, `lora_alpha=32` |
+| `export.py` | Adapter → GGUF Q4_K_M → `ollama create` |
+| `evaluate.py` | Reutiliza evals da Fase 2, relatório baseline vs. fine-tuned |
+
+**Métricas-alvo:** Faithfulness > 0.70 · Answer Relevance > 0.70 · Formato ReAct > 90%
+
+**Stack:** Unsloth + TRL SFTTrainer, QLoRA 4-bit (NF4), ChatML, GGUF via Ollama.
+46 testes unitários + 2 integração.
 
 ---
 
-## 🔜 Fase 4 — Fine-tuning
+## 🔜 Fase 5 — Produção
 
 ### Objetivo
 
-Fazer fine-tuning de um modelo de linguagem pequeno para melhorar a qualidade das respostas
-do pipeline RAG construído nas fases anteriores. Comparar o modelo base vs. o modelo
-fine-tunado usando o sistema de evals da Fase 2.
+Transformar o pipeline RAG da Fase 1 (e o agente da Fase 3) em uma API com
+observabilidade, streaming de respostas e capacidade de monitorar qualidade em produção.
 
 ### O que explorar
 
-- **Dataset de fine-tuning:** gerar pares (pergunta, resposta ideal) a partir dos papers do
-  ArXiv já indexados — o corpus já existe, só falta curar exemplos de qualidade
-- **Técnica:** LoRA / QLoRA para fine-tuning eficiente em GPU consumer (4-8GB VRAM)
-- **Modelo base candidato:** Llama 3.2 (3B) ou Mistral 7B — compatíveis com Ollama
-- **Framework:** Unsloth ou TRL (HuggingFace) para o treino; Ollama para servir o modelo
-  fine-tunado localmente
+- **API REST com FastAPI** — expor o pipeline RAG e o agente como serviços HTTP
+- **Streaming de respostas** — token por token via Server-Sent Events (SSE)
+- **Logging estruturado** — JSON logs com trace_id por request, latência por etapa
+- **Evals em produção** — amostrar respostas reais e avaliar com o sistema da Fase 2
+- **Cache semântico** — evitar re-computar embeddings para queries similares
+- **Containerização** — Dockerfile para reproducibilidade do ambiente completo
 
 ### Métricas de sucesso
 
-- Faithfulness médio > 0.70 (vs. 0.57 do baseline da Fase 2)
-- Answer Relevance médio > 0.70 (vs. 0.60 do baseline)
-- O modelo fine-tunado segue o formato ReAct mais consistentemente que o base
+- API respondendo em < 2s no percentil 95 (p95) para queries normais
+- Streaming funcional — primeiro token visível em < 500ms
+- Evals automáticos rodando sobre amostra de tráfego real
+- Container Docker reproduzindo o ambiente completo em uma máquina limpa
 
 ### Arquitetura planejada
 
 ```
-fase4-finetuning/
-├── data/
-│   ├── raw/              # pares (pergunta, resposta) brutos
-│   └── processed/        # dataset no formato de treino (Alpaca / ChatML)
+fase5-production/
 ├── src/
-│   ├── generate_dataset.py  # usa o pipeline RAG para gerar exemplos
-│   ├── train.py             # loop de fine-tuning com LoRA
-│   ├── export.py            # exporta o adaptador para GGUF / Ollama
-│   └── evaluate.py          # roda os evals da Fase 2 no modelo fine-tunado
-└── tests/
-    └── test_dataset.py
+│   ├── api.py           # FastAPI app com endpoints /query e /agent
+│   ├── streaming.py     # SSE para streaming token-a-token
+│   ├── cache.py         # cache semântico com ChromaDB ou Redis
+│   ├── middleware.py     # logging estruturado, trace_id, latência
+│   └── monitor.py       # sampling + evals automáticos em background
+├── tests/
+├── Dockerfile
+└── docker-compose.yml
 ```
 
 ### Dependências
 
-- `unsloth` ou `trl` para fine-tuning
-- `datasets` (HuggingFace) para manipulação do dataset
-- GPU com ≥ 4GB VRAM (ou Google Colab T4) para o treino
-- Modelo base em formato GGUF para Ollama
+- `fastapi` + `uvicorn` para o servidor
+- `httpx` para testes de integração da API
+- Fases 1–3 como dependências internas (RAG, evals, agente)
