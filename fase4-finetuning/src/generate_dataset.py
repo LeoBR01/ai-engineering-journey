@@ -300,9 +300,9 @@ def _make_default_search_fn() -> Callable[[str], list[dict]]:
     """Cria a função de busca usando o search_papers da Fase 3."""
     fase3_src = Path(__file__).resolve().parent.parent.parent / "fase3-agents" / "src"
     if str(fase3_src) not in sys.path:
-        sys.path.insert(0, str(fase3_src.parent))
+        sys.path.insert(0, str(fase3_src))
 
-    from src.tools import search_papers  # noqa: PLC0415
+    from tools import search_papers  # noqa: PLC0415
 
     return search_papers
 
@@ -409,11 +409,11 @@ def generate_react_dataset(
         generate_fn = _make_default_generate_fn(model)
 
     # Importar SYSTEM_PROMPT da Fase 3
-    fase3_src = Path(__file__).resolve().parent.parent.parent / "fase3-agents"
+    fase3_src = Path(__file__).resolve().parent.parent.parent / "fase3-agents" / "src"
     if str(fase3_src) not in sys.path:
         sys.path.insert(0, str(fase3_src))
 
-    from src.prompt import SYSTEM_PROMPT  # noqa: PLC0415
+    from prompt import SYSTEM_PROMPT  # noqa: PLC0415
 
     cycles = []
     for i, question in enumerate(questions):
