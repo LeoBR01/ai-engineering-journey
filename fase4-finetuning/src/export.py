@@ -56,6 +56,9 @@ def export_to_gguf(
     output_path = Path(output_gguf_path)
     output_path.mkdir(parents=True, exist_ok=True)
 
+    # save_pretrained_gguf realiza o merge adapter+base internamente —
+    # dispensa save_pretrained_merged explícito + conversão via llama.cpp.
+    # O checkpoint merged intermediário (output/merged/) não é gerado em disco.
     logger.info("Exportando para GGUF (%s)...", quantization)
     model.save_pretrained_gguf(
         str(output_path),

@@ -43,7 +43,7 @@ class TrainConfig:
 
     # LoRA
     r: int = 16
-    lora_alpha: int = 16
+    lora_alpha: int = 32  # scaling factor = lora_alpha / r = 2.0 (spec default)
     lora_dropout: float = 0.0
 
     # Treinamento

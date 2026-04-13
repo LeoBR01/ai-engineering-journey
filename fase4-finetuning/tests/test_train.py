@@ -13,7 +13,7 @@ class TestTrainConfig:
         config = TrainConfig()
         assert config.model_name == "unsloth/llama-3.2-3b-instruct"
         assert config.r == 16
-        assert config.lora_alpha == 16
+        assert config.lora_alpha == 32
         assert config.load_in_4bit is True
         assert config.num_epochs == 3
         assert config.learning_rate == 2e-4

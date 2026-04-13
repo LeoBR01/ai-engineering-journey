@@ -60,13 +60,15 @@ def make_generate_fn(model_name: str) -> Callable[[str, str], str]:
 
 def _load_fase2_functions():
     """Importa evaluate_dataset, load_dataset e save_report da Fase 2."""
-    fase2_src = str(FASE2_ROOT)
+    # Adiciona fase2-evals/src/ diretamente para evitar sombreamento do pacote
+    # src/ local. Importa com nomes bare (sem prefixo "src.").
+    fase2_src = str(FASE2_ROOT / "src")
     if fase2_src not in sys.path:
         sys.path.insert(0, fase2_src)
 
-    from src.dataset import load_dataset  # noqa: PLC0415
-    from src.evaluator import evaluate_dataset  # noqa: PLC0415
-    from src.report import save_report  # noqa: PLC0415
+    from dataset import load_dataset  # noqa: PLC0415
+    from evaluator import evaluate_dataset  # noqa: PLC0415
+    from report import save_report  # noqa: PLC0415
 
     return evaluate_dataset, load_dataset, save_report
 
@@ -175,6 +177,8 @@ def _compare_results(
         "metrics": {
             "faithfulness": _metric("avg_faithfulness", target=0.70),
             "answer_relevance": _metric("avg_answer_relevance", target=0.70),
+            # TODO: métrica ReAct format compliance (>90%) não automatizada aqui.
+            # Requer rodar agente da Fase 3 com modelo fine-tuned + medir parse.
         },
         "full_result": current,
         "full_baseline": baseline,
