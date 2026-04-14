@@ -97,9 +97,13 @@ class TestExportToGguf:
         mock_flm.from_pretrained.return_value = (mock_model, mock_tokenizer)
 
         with tempfile.TemporaryDirectory() as tmpdir:
+            # export_to_gguf usa shutil.copytree: o diretório de adapter precisa existir
+            adapter_dir = Path(tmpdir) / "adapter"
+            adapter_dir.mkdir()
+
             from src.export import export_to_gguf
 
-            export_to_gguf(str(Path(tmpdir) / "adapter"), str(Path(tmpdir) / "gguf"))
+            export_to_gguf(str(adapter_dir), str(Path(tmpdir) / "gguf"))
 
         mock_model.save_pretrained_gguf.assert_called_once()
         call_kwargs = mock_model.save_pretrained_gguf.call_args

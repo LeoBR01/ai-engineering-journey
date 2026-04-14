@@ -7,8 +7,11 @@ Uso:
 """
 
 import argparse
+import json
 import logging
+import shutil
 import subprocess
+import tempfile
 from pathlib import Path
 
 logger = logging.getLogger(__name__)
@@ -45,28 +48,88 @@ def export_to_gguf(
             "Execute: uv run pip install 'unsloth[cu124-torch250]' trl peft"
         )
 
-    logger.info("Carregando adapter: %s", adapter_path)
-    model, tokenizer = FastLanguageModel.from_pretrained(
-        model_name=adapter_path,
-        max_seq_length=2048,
-        dtype=None,
-        load_in_4bit=True,
-    )
+    adapter_path_obj = Path(adapter_path)
 
-    output_path = Path(output_gguf_path)
-    output_path.mkdir(parents=True, exist_ok=True)
+    # Se o vocab foi expandido durante o treino (tokens placeholder para TRL),
+    # trimamos os pesos extras do adapter antes de carregar — os tokens nunca
+    # foram usados no treino e podem ser removidos com segurança.
+    base_vocab_size = 128256  # vocab original do llama-3.2
+    adapter_weights_file = adapter_path_obj / "adapter_model.safetensors"
+    needs_trim = False
 
-    # save_pretrained_gguf realiza o merge adapter+base internamente —
-    # dispensa save_pretrained_merged explícito + conversão via llama.cpp.
-    # O checkpoint merged intermediário (output/merged/) não é gerado em disco.
-    logger.info("Exportando para GGUF (%s)...", quantization)
-    model.save_pretrained_gguf(
-        str(output_path),
-        tokenizer,
-        quantization_method=quantization,
-    )
+    if adapter_weights_file.exists():
+        from safetensors import safe_open  # noqa: PLC0415
+        from safetensors.torch import save_file  # noqa: PLC0415
+
+        with safe_open(str(adapter_weights_file), framework="pt", device="cpu") as f:
+            keys = list(f.keys())
+            embed_key = next((k for k in keys if "embed_tokens" in k), None)
+            if embed_key:
+                shape = f.get_slice(embed_key).get_shape()
+                needs_trim = shape[0] > base_vocab_size
+
+        if needs_trim:
+            logger.info(
+                "Trimando embeddings do adapter: %d → %d tokens.",
+                shape[0],
+                base_vocab_size,
+            )
+            tensors = {}
+            with safe_open(  # noqa: E501
+                str(adapter_weights_file), framework="pt", device="cpu"
+            ) as f:
+                for k in f.keys():  # noqa: SIM118
+                    t = f.get_tensor(k)
+                    if "embed_tokens" in k or "lm_head" in k:
+                        t = t[:base_vocab_size]
+                    tensors[k] = t
+
+    with tempfile.TemporaryDirectory() as tmp_dir:
+        tmp_path = Path(tmp_dir)
+        # Copia o adapter para dir temporário
+        shutil.copytree(
+            str(adapter_path_obj), str(tmp_path / "adapter"), dirs_exist_ok=True
+        )
+
+        if needs_trim:
+            save_file(tensors, str(tmp_path / "adapter" / "adapter_model.safetensors"))
+            # Atualiza tokenizer_config para vocab original
+            tok_cfg_file = tmp_path / "adapter" / "tokenizer_config.json"
+            if tok_cfg_file.exists():
+                tok_cfg = json.loads(tok_cfg_file.read_text())
+                # Remove tokens placeholder adicionados pelo workaround TRL
+                added = tok_cfg.get("added_tokens_decoder", {})
+                tok_cfg["added_tokens_decoder"] = {
+                    k: v for k, v in added.items() if int(k) < base_vocab_size
+                }
+                tok_cfg_file.write_text(json.dumps(tok_cfg, indent=2))
+
+        clean_adapter = str(tmp_path / "adapter")
+        logger.info("Carregando adapter (vocab trimado): %s", clean_adapter)
+        model, tokenizer = FastLanguageModel.from_pretrained(
+            model_name=clean_adapter,
+            max_seq_length=2048,
+            dtype=None,
+            load_in_4bit=True,
+        )
+
+        output_path = Path(output_gguf_path)
+        output_path.mkdir(parents=True, exist_ok=True)
+
+        logger.info("Exportando para GGUF (%s)...", quantization)
+        model.save_pretrained_gguf(
+            str(output_path),
+            tokenizer,
+            quantization_method=quantization,
+        )
+
+    # Unsloth appenda "_gguf" ao nome do diretório de saída automaticamente.
+    actual_output = output_path.parent / (output_path.name + "_gguf")
+    if actual_output.exists() and list(actual_output.glob("*.gguf")):
+        logger.info("GGUF salvo em: %s (Unsloth renomeou o diretório)", actual_output)
+        return actual_output
+
     logger.info("GGUF salvo em: %s", output_path)
-
     return output_path
 
 
@@ -151,8 +214,8 @@ def export_and_register(
     Returns:
         Nome do modelo registrado no Ollama.
     """
-    export_to_gguf(adapter_path, gguf_output_path, quantization)
-    return register_with_ollama(gguf_output_path, model_name)
+    actual_gguf_path = export_to_gguf(adapter_path, gguf_output_path, quantization)
+    return register_with_ollama(str(actual_gguf_path), model_name)
 
 
 def main() -> None:

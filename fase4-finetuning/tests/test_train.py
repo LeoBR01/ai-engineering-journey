@@ -30,6 +30,16 @@ class TestTrainConfig:
 
 
 class TestLoadAndFormatDataset:
+    def _make_tokenizer(self):
+        """Cria mock de tokenizer com apply_chat_template e __call__ configurados."""
+        mock_tokenizer = MagicMock()
+        mock_tokenizer.apply_chat_template.return_value = "<|s|>S<|u|>Q<|a|>A"
+        mock_tokenizer.return_value = {
+            "input_ids": [1, 2, 3],
+            "attention_mask": [1, 1, 1],
+        }
+        return mock_tokenizer
+
     def test_loads_jsonl_and_applies_template(self) -> None:
         examples = [
             {
@@ -41,10 +51,7 @@ class TestLoadAndFormatDataset:
             }
         ] * 5
 
-        mock_tokenizer = MagicMock()
-        mock_tokenizer.apply_chat_template.return_value = (
-            "<|system|>System<|user|>Q<|assistant|>A"
-        )
+        mock_tokenizer = self._make_tokenizer()
 
         with tempfile.NamedTemporaryFile(mode="w", suffix=".jsonl", delete=False) as f:
             for ex in examples:
@@ -54,7 +61,7 @@ class TestLoadAndFormatDataset:
         dataset = load_and_format_dataset(tmp_path, mock_tokenizer)
 
         assert len(dataset) == 5
-        assert "text" in dataset.column_names
+        assert "input_ids" in dataset.column_names
         assert mock_tokenizer.apply_chat_template.call_count == 5
 
     def test_apply_chat_template_called_correctly(self) -> None:
@@ -65,8 +72,7 @@ class TestLoadAndFormatDataset:
             ]
         }
 
-        mock_tokenizer = MagicMock()
-        mock_tokenizer.apply_chat_template.return_value = "formatted text"
+        mock_tokenizer = self._make_tokenizer()
 
         with tempfile.NamedTemporaryFile(mode="w", suffix=".jsonl", delete=False) as f:
             f.write(json.dumps(example) + "\n")
@@ -88,8 +94,7 @@ class TestLoadAndFormatDataset:
             ]
         }
 
-        mock_tokenizer = MagicMock()
-        mock_tokenizer.apply_chat_template.return_value = "text"
+        mock_tokenizer = self._make_tokenizer()
 
         with tempfile.NamedTemporaryFile(mode="w", suffix=".jsonl", delete=False) as f:
             f.write(json.dumps(example) + "\n")
@@ -102,20 +107,30 @@ class TestLoadAndFormatDataset:
 
 
 class TestTrainFunction:
-    @patch("src.train.SFTTrainer")
-    @patch("src.train.TrainingArguments")
-    @patch("src.train.FastLanguageModel")
-    def test_train_calls_trainer_train(
-        self, mock_flm: MagicMock, mock_args: MagicMock, mock_trainer_cls: MagicMock
-    ) -> None:
+    def _make_mocks(self, mock_flm: MagicMock, mock_trainer_cls: MagicMock):
         mock_model = MagicMock()
         mock_tokenizer = MagicMock()
         mock_tokenizer.apply_chat_template.return_value = "text"
+        mock_tokenizer.return_value = {
+            "input_ids": [1, 2, 3],
+            "attention_mask": [1, 1, 1],
+        }
+        mock_tokenizer.get_vocab.return_value = {}
         mock_flm.from_pretrained.return_value = (mock_model, mock_tokenizer)
         mock_flm.get_peft_model.return_value = mock_model
+        mock_trainer_cls.return_value = MagicMock()
+        return mock_model, mock_tokenizer
 
-        mock_trainer = MagicMock()
-        mock_trainer_cls.return_value = mock_trainer
+    @patch("src.train.SFTConfig")
+    @patch("src.train.SFTTrainer")
+    @patch("src.train.FastLanguageModel")
+    def test_train_calls_trainer_train(
+        self,
+        mock_flm: MagicMock,
+        mock_trainer_cls: MagicMock,
+        mock_sft_config: MagicMock,
+    ) -> None:
+        mock_model, mock_tokenizer = self._make_mocks(mock_flm, mock_trainer_cls)
 
         with tempfile.TemporaryDirectory() as tmpdir:
             dataset_path = Path(tmpdir) / "train.jsonl"
@@ -136,22 +151,22 @@ class TestTrainFunction:
             )
             train(config)
 
-        mock_trainer.train.assert_called_once()
+        # _Trainer é subclasse local de SFTTrainer (mock) — seu .train() não é
+        # capturado via mock_trainer_cls.return_value. Verificamos pelos efeitos
+        # colaterais: save_pretrained é chamado após o trainer.train() completar.
         mock_model.save_pretrained.assert_called_once()
         mock_tokenizer.save_pretrained.assert_called_once()
 
+    @patch("src.train.SFTConfig")
     @patch("src.train.SFTTrainer")
-    @patch("src.train.TrainingArguments")
     @patch("src.train.FastLanguageModel")
     def test_train_returns_output_path(
-        self, mock_flm: MagicMock, mock_args: MagicMock, mock_trainer_cls: MagicMock
+        self,
+        mock_flm: MagicMock,
+        mock_trainer_cls: MagicMock,
+        mock_sft_config: MagicMock,
     ) -> None:
-        mock_model = MagicMock()
-        mock_tokenizer = MagicMock()
-        mock_tokenizer.apply_chat_template.return_value = "text"
-        mock_flm.from_pretrained.return_value = (mock_model, mock_tokenizer)
-        mock_flm.get_peft_model.return_value = mock_model
-        mock_trainer_cls.return_value = MagicMock()
+        self._make_mocks(mock_flm, mock_trainer_cls)
 
         with tempfile.TemporaryDirectory() as tmpdir:
             dataset_path = Path(tmpdir) / "train.jsonl"

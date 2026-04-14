@@ -20,15 +20,14 @@ logger = logging.getLogger(__name__)
 # try/except porque requerem GPU + instalação especial do Unsloth.
 try:
     import torch  # noqa: F401
-    from transformers import TrainingArguments  # noqa: F401
-    from trl import SFTTrainer  # noqa: F401
+    from trl import SFTConfig, SFTTrainer  # noqa: F401
     from unsloth import FastLanguageModel  # noqa: F401
 except ImportError:
     # Instalar com: uv run pip install "unsloth[cu124-torch250]" trl peft
     torch = None  # type: ignore[assignment]
     FastLanguageModel = None  # type: ignore[assignment]
+    SFTConfig = None  # type: ignore[assignment]
     SFTTrainer = None  # type: ignore[assignment]
-    TrainingArguments = None  # type: ignore[assignment]
 
 
 @dataclass
@@ -55,21 +54,26 @@ class TrainConfig:
     seed: int = 42
 
 
-def load_and_format_dataset(path: str, tokenizer):  # -> datasets.Dataset
-    """Carrega JSONL no formato ChatML e aplica o template de chat.
+def load_and_format_dataset(path: str, tokenizer, max_seq_length: int = 2048):
+    """Carrega JSONL ChatML, aplica chat template e tokeniza em processo único.
 
-    Converte cada exemplo de {'messages': [...]} para {'text': '<chat formatted>'}.
+    Pre-tokeniza o dataset para evitar que SFTTrainer chame _prepare_dataset
+    com multiprocessing — que falha porque ConfigModuleInstance do Unsloth
+    não é serializável via pickle/dill.
 
     Args:
         path: caminho para arquivo .jsonl com exemplos em formato ChatML.
         tokenizer: tokenizer com método apply_chat_template.
+        max_seq_length: tamanho máximo de sequência para truncamento.
 
     Returns:
-        HuggingFace Dataset com coluna 'text'.
+        HuggingFace Dataset com colunas 'input_ids', 'attention_mask' e 'labels'.
     """
     from datasets import Dataset
 
-    examples = []
+    input_ids_list = []
+    attention_mask_list = []
+
     with open(path, encoding="utf-8") as f:
         for line in f:
             line = line.strip()
@@ -81,9 +85,23 @@ def load_and_format_dataset(path: str, tokenizer):  # -> datasets.Dataset
                 tokenize=False,
                 add_generation_prompt=False,
             )
-            examples.append({"text": text})
+            encoded = tokenizer(
+                text,
+                truncation=True,
+                max_length=max_seq_length,
+                padding=False,
+                return_tensors=None,
+            )
+            input_ids_list.append(encoded["input_ids"])
+            attention_mask_list.append(encoded["attention_mask"])
 
-    return Dataset.from_list(examples)
+    return Dataset.from_dict(
+        {
+            "input_ids": input_ids_list,
+            "attention_mask": attention_mask_list,
+            "labels": input_ids_list,  # causal LM: labels == input_ids
+        }
+    )
 
 
 def train(config: TrainConfig) -> Path:
@@ -129,20 +147,39 @@ def train(config: TrainConfig) -> Path:
     )
 
     logger.info("Carregando dataset: %s", config.dataset_path)
-    train_dataset = load_and_format_dataset(config.dataset_path, tokenizer)
+    train_dataset = load_and_format_dataset(
+        config.dataset_path, tokenizer, config.max_seq_length
+    )
     logger.info("Dataset carregado: %d exemplos", len(train_dataset))
 
     # Verifica suporte a bf16 apenas se torch estiver disponível
     use_bf16 = bool(torch is not None and torch.cuda.is_bf16_supported())
 
-    trainer = SFTTrainer(
+    # Workaround: TRL>=0.12 valida placeholders do chat template (<EOS_TOKEN>,
+    # <PAD_TOKEN> etc.) no vocab do Unsloth (TokenizersBackend), que não os expõe.
+    # Adicionamos todos de uma vez para que a validação passe sem alterar o modelo.
+    _placeholder_tokens = ["<EOS_TOKEN>", "<PAD_TOKEN>", "<BOS_TOKEN>", "<UNK_TOKEN>"]
+    _missing = [t for t in _placeholder_tokens if t not in tokenizer.get_vocab()]
+    if _missing:
+        tokenizer.add_special_tokens({"additional_special_tokens": _missing})
+        model.resize_token_embeddings(len(tokenizer))
+
+    # Subclasse local que substitui compute_loss do TRL>=0.15 para evitar
+    # entropy_from_logits — que falha porque Unsloth retorna outputs.logits
+    # como função (lazy), não como tensor.
+    class _Trainer(SFTTrainer):
+        def compute_loss(self, model, inputs, return_outputs=False, **kwargs):
+            outputs = model(**inputs)
+            loss = outputs.loss
+            return (loss, outputs) if return_outputs else loss
+
+    # Dataset já pre-tokenizado em load_and_format_dataset — SFTTrainer
+    # pula _prepare_dataset quando encontra coluna 'input_ids' no dataset.
+    trainer = _Trainer(
         model=model,
-        tokenizer=tokenizer,
         train_dataset=train_dataset,
-        dataset_text_field="text",
-        max_seq_length=config.max_seq_length,
-        dataset_num_proc=2,
-        args=TrainingArguments(
+        processing_class=tokenizer,
+        args=SFTConfig(
             per_device_train_batch_size=config.batch_size,
             gradient_accumulation_steps=config.grad_accumulation,
             warmup_steps=config.warmup_steps,

@@ -41,16 +41,18 @@ def make_generate_fn(model_name: str) -> Callable[[str, str], str]:
     """
 
     def generate_fn(question: str, context: str) -> str:
+        # Formato idêntico ao dataset de treino (generate_dataset.py linha 108-120):
+        # system = instrução simples, user = "Context: ...\n\nQuestion: ..."
         system = (
-            "You are an assistant that answers questions exclusively based on the "
-            "provided context. If the answer is not in the context, say so clearly.\n\n"
-            f"Context:\n{context}"
+            "You are a helpful research assistant. "
+            "Answer questions based only on the provided context."
         )
+        user_content = f"Context: {context}\n\nQuestion: {question}"
         response = ollama.chat(
             model=model_name,
             messages=[
                 {"role": "system", "content": system},
-                {"role": "user", "content": question},
+                {"role": "user", "content": user_content},
             ],
         )
         return response.message.content
@@ -58,19 +60,42 @@ def make_generate_fn(model_name: str) -> Callable[[str, str], str]:
     return generate_fn
 
 
+def _load_module(name: str, path: Path):
+    """Carrega um módulo pelo path absoluto, registrando no sys.modules.
+
+    Define __package__ como o prefixo do nome (ex: "fase2" para "fase2.evaluator")
+    para que os relative imports internos (from .dataset import ...) funcionem.
+    """
+    import importlib.util  # noqa: PLC0415
+
+    spec = importlib.util.spec_from_file_location(name, path)
+    mod = importlib.util.module_from_spec(spec)  # type: ignore[arg-type]
+    mod.__package__ = name.rpartition(".")[0]
+    sys.modules[name] = mod
+    spec.loader.exec_module(mod)  # type: ignore[union-attr]
+    return mod
+
+
 def _load_fase2_functions():
-    """Importa evaluate_dataset, load_dataset e save_report da Fase 2."""
-    # Adiciona fase2-evals/src/ diretamente para evitar sombreamento do pacote
-    # src/ local. Importa com nomes bare (sem prefixo "src.").
-    fase2_src = str(FASE2_ROOT / "src")
-    if fase2_src not in sys.path:
-        sys.path.insert(0, fase2_src)
+    """Importa evaluate_dataset, load_dataset e save_report da Fase 2.
 
-    from dataset import load_dataset  # noqa: PLC0415
-    from evaluator import evaluate_dataset  # noqa: PLC0415
-    from report import save_report  # noqa: PLC0415
+    Usa importlib para carregar os módulos da Fase 2 diretamente pelo path,
+    evitando conflito de nomes com o pacote src/ local da Fase 4.
+    """
+    fase2_src = FASE2_ROOT / "src"
 
-    return evaluate_dataset, load_dataset, save_report
+    _load_module("fase2.dataset", fase2_src / "dataset.py")
+    _load_module("fase2.metrics_retrieval", fase2_src / "metrics_retrieval.py")
+    _load_module("fase2.metrics_generation", fase2_src / "metrics_generation.py")
+    evaluator_mod = _load_module("fase2.evaluator", fase2_src / "evaluator.py")
+    report_mod = _load_module("fase2.report", fase2_src / "report.py")
+    dataset_mod = sys.modules["fase2.dataset"]
+
+    return (
+        evaluator_mod.evaluate_dataset,
+        dataset_mod.load_dataset,
+        report_mod.save_report,
+    )
 
 
 def _make_retrieve_fn() -> Callable:

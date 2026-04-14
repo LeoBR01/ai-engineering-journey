@@ -100,7 +100,7 @@ class TestMakeGenerateFn:
         assert result == "Answer."
 
     @patch("src.evaluate.ollama")
-    def test_context_in_system_message(self, mock_ollama: MagicMock) -> None:
+    def test_context_in_user_message(self, mock_ollama: MagicMock) -> None:
         mock_ollama.chat.return_value = MagicMock(message=MagicMock(content="A."))
 
         generate_fn = make_generate_fn("model")
@@ -108,5 +108,7 @@ class TestMakeGenerateFn:
 
         call_args = mock_ollama.chat.call_args
         messages = call_args.kwargs["messages"]
-        system_content = messages[0]["content"]
-        assert "unique_context_xyz" in system_content
+        # Contexto vai na mensagem user (não no system) para manter
+        # consistência com o formato do dataset de treino.
+        user_content = next(m["content"] for m in messages if m["role"] == "user")
+        assert "unique_context_xyz" in user_content
