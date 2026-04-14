@@ -8,7 +8,7 @@
 | Fase 2 | Sistema de Evals | ✅ Completo |
 | Fase 3 | Agente ReAct | ✅ Completo |
 | Fase 4 | Fine-tuning QLoRA | ✅ Completo |
-| Fase 5 | Produção | 🔜 Próxima |
+| Fase 5 | Produção | ✅ Completo |
 
 ---
 
@@ -84,46 +84,20 @@ qualidade RAG e aderência ao formato ReAct.
 
 ---
 
-## 🔜 Fase 5 — Produção
+## ✅ Fase 5 — Produção (completo)
 
-### Objetivo
+API FastAPI de produção expondo o pipeline RAG (Fase 1) e o agente ReAct (Fase 3).
 
-Transformar o pipeline RAG da Fase 1 (e o agente da Fase 3) em uma API com
-observabilidade, streaming de respostas e capacidade de monitorar qualidade em produção.
+| Módulo | Função |
+|---|---|
+| `router.py` | Heurística RAG vs Agent baseada em AGENT_KEYWORDS |
+| `cache.py` | Cache semântico ChromaDB, similaridade cosine ≥ 0.92, TTL 24h |
+| `rag_adapter.py` | Encapsula pipeline RAG da Fase 1 via sys.modules isolation |
+| `agent_adapter.py` | Encapsula agente ReAct da Fase 3 via sys.modules isolation |
+| `streaming.py` | SSE token-a-token via Ollama streaming |
+| `middleware.py` | Logging JSON estruturado com trace_id por request |
+| `monitor.py` | BackgroundTask para evals em 10% do tráfego |
+| `api.py` | FastAPI app — POST /query (JSON ou SSE), GET /health |
 
-### O que explorar
-
-- **API REST com FastAPI** — expor o pipeline RAG e o agente como serviços HTTP
-- **Streaming de respostas** — token por token via Server-Sent Events (SSE)
-- **Logging estruturado** — JSON logs com trace_id por request, latência por etapa
-- **Evals em produção** — amostrar respostas reais e avaliar com o sistema da Fase 2
-- **Cache semântico** — evitar re-computar embeddings para queries similares
-- **Containerização** — Dockerfile para reproducibilidade do ambiente completo
-
-### Métricas de sucesso
-
-- API respondendo em < 2s no percentil 95 (p95) para queries normais
-- Streaming funcional — primeiro token visível em < 500ms
-- Evals automáticos rodando sobre amostra de tráfego real
-- Container Docker reproduzindo o ambiente completo em uma máquina limpa
-
-### Arquitetura planejada
-
-```
-fase5-production/
-├── src/
-│   ├── api.py           # FastAPI app com endpoints /query e /agent
-│   ├── streaming.py     # SSE para streaming token-a-token
-│   ├── cache.py         # cache semântico com ChromaDB ou Redis
-│   ├── middleware.py     # logging estruturado, trace_id, latência
-│   └── monitor.py       # sampling + evals automáticos em background
-├── tests/
-├── Dockerfile
-└── docker-compose.yml
-```
-
-### Dependências
-
-- `fastapi` + `uvicorn` para o servidor
-- `httpx` para testes de integração da API
-- Fases 1–3 como dependências internas (RAG, evals, agente)
+**Stack:** FastAPI, uvicorn, ChromaDB, Ollama, Docker + docker-compose.
+47 testes unitários + 4 integração.
