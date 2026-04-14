@@ -1,0 +1,8 @@
+# fase5-production/.dockerignore
+**/.venv
+**/__pycache__
+**/*.pyc
+**/.pytest_cache
+**/chroma_db
+**/data/chroma_cache
+**/.git

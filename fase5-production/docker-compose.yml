@@ -1,0 +1,41 @@
+# fase5-production/docker-compose.yml
+services:
+  app:
+    build:
+      context: ..
+      dockerfile: fase5-production/Dockerfile
+    ports:
+      - "8000:8000"
+    volumes:
+      # Monta o ChromaDB da Fase 1 como read-only
+      - ../fase1-rag/chroma_db:/app/fase1-rag/chroma_db:ro
+      # Dados do cache semântico persistem entre reinicializações
+      - fase5_cache:/app/fase5-production/data/chroma_cache
+    depends_on:
+      ollama:
+        condition: service_healthy
+    environment:
+      - PYTHONUNBUFFERED=1
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+
+  ollama:
+    image: ollama/ollama:latest
+    volumes:
+      - ollama_data:/root/.ollama
+    ports:
+      - "11434:11434"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:11434/api/tags"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+volumes:
+  ollama_data:
+  fase5_cache:
