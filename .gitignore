@@ -35,6 +35,14 @@ htmlcov/
 # uv
 uv.lock
 
+# Fase 4 — outputs de treino (binários grandes, não versionados)
+fase4-finetuning/output/
+fase4-finetuning/data/processed/
+fase4-finetuning/data/raw/
+fase4-finetuning/data/results/
+fase4-finetuning/unsloth_compiled_cache/
+fase4-finetuning/.codex
+
 # IDEs
 .vscode/
 .idea/

@@ -77,10 +77,12 @@ qualidade RAG e aderência ao formato ReAct.
 | `export.py` | Adapter → GGUF Q4_K_M → `ollama create` |
 | `evaluate.py` | Reutiliza evals da Fase 2, relatório baseline vs. fine-tuned |
 
-**Métricas-alvo:** Faithfulness > 0.70 · Answer Relevance > 0.70 · Formato ReAct > 90%
+**Métricas obtidas (2026-04-13):** Faithfulness 0.642 (+13% vs baseline 0.567) · Answer Relevance 0.660 (+10% vs baseline 0.600)
 
-**Stack:** Unsloth + TRL SFTTrainer, QLoRA 4-bit (NF4), ChatML, GGUF via Ollama.
-46 testes unitários + 2 integração.
+**Modelo registrado:** `llama3.2-finetuned` no Ollama — 713 exemplos, 3 épocas, RTX 3080, ~9min.
+
+**Stack:** Unsloth + TRL SFTTrainer, QLoRA 4-bit (NF4), ChatML, GGUF Q4_K_M via Ollama.
+48 testes unitários.
 
 ---
 
@@ -101,3 +103,45 @@ API FastAPI de produção expondo o pipeline RAG (Fase 1) e o agente ReAct (Fase
 
 **Stack:** FastAPI, uvicorn, ChromaDB, Ollama, Docker + docker-compose.
 47 testes unitários + 4 integração.
+
+---
+
+## 🔜 Próximos passos (2026-04-14)
+
+### Prioridade 1 — Subir a API da Fase 5
+
+```bash
+cd fase5-production
+uv run uvicorn src.api:app --reload --port 8000
+```
+
+Testar os endpoints:
+```bash
+# Health check
+curl http://localhost:8000/health
+
+# Query JSON
+curl -X POST http://localhost:8000/query \
+  -H "Content-Type: application/json" \
+  -d '{"question": "What is RAG?"}'
+
+# Query SSE (streaming)
+curl -X POST http://localhost:8000/query \
+  -H "Content-Type: application/json" \
+  -H "Accept: text/event-stream" \
+  -d '{"question": "What is RAG?"}'
+```
+
+Verificar:
+- [ ] `/health` reporta `ollama: true` e `chromadb: true`
+- [ ] Query simples retorna JSON com `answer`, `solver`, `cached`
+- [ ] Segunda query igual retorna `cached: true`
+- [ ] Query complexa ("compare X and Y") usa `solver: agent`
+- [ ] SSE streaming chega token a token com `[DONE]` no fim
+
+### Prioridade 2 — Docker (opcional)
+
+```bash
+cd fase5-production
+docker compose up --build
+```
